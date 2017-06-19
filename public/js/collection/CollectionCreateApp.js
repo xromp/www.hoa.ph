@@ -14,10 +14,9 @@ define([
 
         vm.collectionDetails = {
           type:'HOMEOWNER',
-          refid:'',
           qty:1,
-          amount:0,
-          category:'CARSTICKER',
+          amount:'',
+          category_code:'MONTHLYDUES',
           action:'CREATE'
         };
 
@@ -79,7 +78,7 @@ define([
             dataCopy.ordate = $filter('date')(dataCopy.ordate,'yyyy-MM-dd');
             dataCopy.entityvalues = [];
 
-            if (data.category == 'MONTHLYDUES') {
+            if (data.category_code == 'MONTHLYDUES') {
               angular.forEach(vm.monthSelected, function(v, k){
                 if (v) {
                   dataCopy.entityvalues.push({
@@ -89,7 +88,7 @@ define([
                   })
                 }
               });
-            } else if (data.category == 'CARSTICKER') {
+            } else if (data.category_code == 'CARSTICKER') {
               angular.forEach(vm.stickerDetails, function(v, k) {
                 if (v) {
                   dataCopy.entityvalues.push({
@@ -110,8 +109,7 @@ define([
             var appBlockUI = blockUI.instances.get('blockUI');
             appBlockUI.start();
 
-            var formData = angular.toJson(dataCopy);
-            CollectionCreateSrvcs.save(formData)
+            CollectionCreateSrvcs.action(dataCopy)
             .then (function (response) {
               if (response.data.status == 200) {
                 
@@ -131,11 +129,11 @@ define([
                       };
                     }
                   }
-                });
+              });
 
-                modalInstance.result.then(function (){
-                },function (){
-                });
+              modalInstance.result.then(function (){
+              },function (){
+              });
               appBlockUI.stop();
             },function(){alert("Error occured!");
               appBlockUI.stop();
@@ -155,10 +153,21 @@ define([
               vm.collectionDetails = response.data.data[0];
               vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
               vm.collectionDetails.amount = parseFloat(vm.collectionDetails.amount);
+              vm.collectionDetails.action = dataCopy.action;
 
               if (vm.collectionDetails.category_code == 'MONTHLYDUES') {
-                vm.year = ['2017','2018'];
+                vm.year = [];
+                angular.forEach(vm.collectionDetails.entityvalues, function(v, k){
+                  if (vm.year.indexOf(v.entityvalue2) == -1) {
+                    vm.year.push(v.entityvalue2);
+                  }
+                });
+                vm.monthSelected = {};
                 vm.populateMonths();
+
+                angular.forEach(vm.collectionDetails.entityvalues, function(v, k){
+                  vm.monthSelected[v.entityvalue1+'-'+v.entityvalue2] = true;
+                });
               }
             }
           },function(){ alert("Bad Request!")})
@@ -188,7 +197,7 @@ define([
           CollectionCreateSrvcs.getperson(formDataCopy)
           .then( function(response, status) {
             if (response.data.status == 200) {
-              vm.refList = response.data.data;
+              vm.personList = response.data.data;
             }
           },function(){alert("Error occured!");
           });
@@ -199,7 +208,7 @@ define([
           CollectionCreateSrvcs.getcategory()
           .then(function(response, status){
             if (response.status == 200) {
-              vm.categoryList = response.data.data;    
+              vm.categoryList = response.data.data;
             }
           }, function(){
             alert('Error!')
@@ -222,16 +231,16 @@ define([
           angular.forEach(vm.year, function(v, k){
             if (v > tempHighYear && i=='ADD') {
               tempHighYear = v;
-              newYear = tempHighYear+1;
+              newYear = parseInt(tempHighYear)+1;
             }
 
             if (v < tempLowYear && i == 'LESS') {
               tempLowYear =v;
-              newYear = tempLowYear-1
+              newYear = parseInt(tempLowYear)-1
             }
           });
 
-          vm.year.push(newYear);
+          vm.year.push(String(newYear));
           vm.populateMonths();
         };
 
@@ -258,7 +267,7 @@ define([
           vm.stickerDetails.splice(i,1);
         };
 
-        vm.addRef = function(data){
+        vm.addPerson = function(data){
           var modalInstance = $uibModal.open({
             controller:'PersonModalCrtl',
             templateUrl:'collection.add-person',
@@ -320,22 +329,20 @@ define([
       function CategoryModalCrtl ($compile, $uibModalInstance, formData, CollectionCreateSrvcs) {
         var vm = this;
         vm.formData = formData;
-        console.log(vm.formData);
-        // vm.ok = function() {
-        //   $uibModalInstance.close();
-        // };
+
         vm.submit= function(i){
           if (vm.frmCreate.$valid) {
             vm.frmCreate.withError = false;
             vm.response = [];
 
             var formDataCopy = angular.copy(i);
+            formDataCopy.code = formDataCopy.code.toUpperCase();
 
             var formData = angular.toJson(formDataCopy);
             CollectionCreateSrvcs.savecategory(formData)
             .then(function(response, status){
               vm.response.push(response.data);
-
+              vm.categoryDetails = {};
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;
@@ -365,7 +372,7 @@ define([
             CollectionCreateSrvcs.saveperson(formData)
             .then(function(response, status){
               vm.response.push(response.data);
-
+              vm.categoryDetails = {};
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;
@@ -385,6 +392,30 @@ define([
             return $http({
               method:'POST',
               url: '/api/collection/create',
+              data:data,
+              headers: {'Content-Type': 'application/json'}
+            })
+          },
+          update: function(data) {
+            return $http({
+              method:'POST',
+              url: '/api/collection/update',
+              data:data,
+              headers: {'Content-Type': 'application/json'}
+            })
+          },
+          action: function(formData) {
+            var url;
+            if (formData.action == 'CREATE') {
+              url = '/api/collection/create';
+            } else if (formData.action =='EDIT') {
+              url = '/api/collection/update';
+            }
+
+            var data = angular.toJson(formData);
+            return $http({
+              method:'POST',
+              url: url,
               data:data,
               headers: {'Content-Type': 'application/json'}
             })

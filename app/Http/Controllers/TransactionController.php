@@ -98,17 +98,36 @@ class TransactionController extends Controller
     		'amount'=>'required'
     	]);
 
-    	$isORNoExist = DB::table('transaction')
+
+        $isCollectionPosted = DB::table('collection')
+            -> where('orno',$formData['refid'])
+            -> where('deleted',0)
+            -> where('posted',1)
+            -> first();
+
+        if ($isCollectionPosted) {
+            if ($isCollectionPosted->posted) {
+                return response() -> json([
+                    'status'=>403,
+                    'data'=>'',
+                    'message'=>"Collection OR no. {$isCollectionPosted->orno} is already posted."
+                ]);
+            }
+        }
+
+    	$isTransPosted = DB::table('transaction')
     		-> where('refid',$formData['refid'])
             -> where('trantype',$formData['trantype'])
             -> where('deleted',0)
+            -> where('posted',1)
     		-> first();
-    	if ($isORNoExist) {
-    		if ($isORNoExist->posted) {
+
+    	if ($isTransPosted) {
+    		if ($isTransPosted->posted) {
 	    		return response() -> json([
 	    			'status'=>403,
 	    			'data'=>'',
-	    			'message'=>"OR no. {$isORNoExist->refid} is already posted."
+	    			'message'=>"Transactino OR no. {$isTransPosted->refid} is already posted."
 	    		]);
     		}
     	}

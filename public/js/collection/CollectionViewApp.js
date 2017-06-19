@@ -4,6 +4,7 @@ define([
   'use strict';
     app.lazy.controller('CollectionViewCtrl',CollectionViewCtrl)
     app.lazy.controller('ModalInfoInstanceCtrl',ModalInfoInstanceCtrl)
+    app.lazy.controller('CollectionDetailsInstanceCtrl',CollectionDetailsInstanceCtrl)
     app.lazy.factory('CollectionViewSrvcs', CollectionViewSrvcs)
 
       CollectionViewCtrl.$inject = ['$scope', '$window', '$filter', 'CollectionViewSrvcs','$uibModal','blockUI', '$http']
@@ -79,11 +80,10 @@ define([
             },function (){
             });
           },function(){alert('Error occured')});
-
         };
 
         vm.edit = function(i) {
-          $window.location.href='/collection/create?id='+i.collectionid;
+          $window.location.href='/collection/edit/'+i.collectionid;
         };
 
         vm.datepickerOpen = function(i,y) {
@@ -101,7 +101,8 @@ define([
           CollectionViewSrvcs.delete(formData)
           .then(function(response, status){
             if (response.data.status == 200) {
-              i.deleted = 1;  
+              i.deleted = 1;
+              vm.search(vm.query);
             }
             var modalInstance = $uibModal.open({
               controller:'ModalInfoInstanceCtrl',
@@ -121,8 +122,33 @@ define([
             },function (){
             });
           },function(){alert('Error occured')});
-
         };
+
+        vm.zeroPad = function(num, places) {
+          var zero = places - num.toString().length + 1;
+          return Array(+(zero > 0 && zero)).join("0") + num;
+        };
+
+        vm.showDetails = function (data) {
+          var modalInstance = $uibModal.open({
+            controller:'CollectionDetailsInstanceCtrl',
+            templateUrl:'collection.view-details',
+            controllerAs: 'vm',
+            resolve :{
+              formData: function () {
+                return {
+                  title: 'Collection Details',
+                  formData: data,
+                  parent: vm
+                };
+              }
+            }
+          });
+
+          modalInstance.result.then(function (){
+          },function (){
+          });
+        }
 
         vm.init();
       }
@@ -138,6 +164,53 @@ define([
         vm.cancel = function() {
           $uibModalInstance.dismiss('cancel');
         };
+      }
+
+      CollectionDetailsInstanceCtrl.$inject = ['$uibModalInstance', '$filter', 'formData','CollectionViewSrvcs']
+      function CollectionDetailsInstanceCtrl ($uibModalInstance, $filter, formData, CollectionViewSrvcs) {
+        var vm = this;
+        vm.formData =formData;
+        vm.init = function(data) {
+          var dataCopy = angular.copy(data);
+
+          var formData = angular.toJson(dataCopy);
+          CollectionViewSrvcs.get(formData)
+          .then(function(response, status){
+            if (response.data.status == 200) {
+              vm.collectionDetails = response.data.data[0];
+            }
+          });
+        }
+        vm.ok = function() {
+          $uibModalInstance.close();
+        };
+
+        vm.post = function(i) {
+          var formDataCopy = angular.copy(i)
+          vm.response = {};
+          
+          formDataCopy.refid = formDataCopy.orno;
+          formDataCopy.refdate = $filter('date')(formDataCopy.ordate,'yyyy-MM-dd');
+          formDataCopy.amount = formDataCopy.amount_paid;
+          formDataCopy.trantype = 'COLLECTION';
+
+          var formData = angular.toJson(formDataCopy);
+          CollectionViewSrvcs.post(formData)
+          .then(function(response, status){
+            vm.response = response.data;
+          },function(){alert('Error occured')});
+        };
+
+        vm.cancel = function() {
+          $uibModalInstance.dismiss('cancel');
+        };
+
+        vm.zeroPad = function(num, places) {
+          var zero = places - num.toString().length + 1;
+          return Array(+(zero > 0 && zero)).join("0") + num;
+        };
+
+        vm.init(vm.formData.formData);
       }
 
       CollectionViewSrvcs.$inject = ['$http']

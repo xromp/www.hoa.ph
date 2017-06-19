@@ -69,18 +69,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-class="{'bg-success':collection.posted,'bg-danger':collection.deleted}" ng-repeat="collection in cv.collectionDetails | orderBy:'orno'">
+        <tr ng-class="{'bg-success':collection.posted,'bg-danger':collection.deleted}" ng-repeat="collection in cv.collectionDetails | orderBy:'orno'" ng-click="cv.showDetails(collection)">
           <td ><% $index+1 %></td>
-          <td class="text-right" ng-bind="collection.orno"></td>
+          <td class="text-center" ng-bind="cv.zeroPad(collection.orno,6)"></td>
           <td ng-bind="collection.ordate | date:'dd-MMM-yyyy'"></td>
-          <td ng-bind="collection.category"></td>
-          <td class="text-right" ng-bind="collection.amount"></td>
+          <td ng-bind="collection.category_description"></td>
+          <td class="text-right" ng-bind="collection.amount | number:2" style="padding-right:5%"></td>
           <td ng-bind="collection.created_at | date:'dd-MMM-yyyy'"></td>
           <td class="">
             <div class="pull-right">
-              <button class="btn btn-success btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.post(collection)"><i class="glyphicon glyphicon-ok"></i></button>
-              <button class="btn btn-info btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.edit(collection)"><i class="glyphicon glyphicon-pencil"></i></button>
-              <button class="btn btn-danger btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.remove(collection)"><i class="glyphicon glyphicon-remove"></i></button>
+              <button class="btn btn-success btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.post(collection);$event.stopPropagation();"><i class="glyphicon glyphicon-ok"></i></button>
+              <button class="btn btn-info btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.edit(collection);$event.stopPropagation();"><i class="glyphicon glyphicon-pencil"></i></button>
+              <button class="btn btn-danger btn-xs" ng-disabled="collection.posted || collection.deleted" ng-click="cv.remove(collection);$event.stopPropagation();"><i class="glyphicon glyphicon-remove"></i></button>
             </div>
           </td>
         </tr>

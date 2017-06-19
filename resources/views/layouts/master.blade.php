@@ -41,7 +41,7 @@
   <script type="text/javascript" src="{{URL::to('assets/custom/js/custom.min.js')}}"></script>
 
   <script type="text/javascript" src="{{URL::to('assets/angular/angular.min.js')}}"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>
+  <script type="text/javascript" src="{{URL::to('assets/angular-route/angular-route.min.js')}}"></script>
 
   <script data-main="{{URL::to('js/module-loader/requirejs-config.js')}}" src="{{URL::to('assets/requirejs/require.js')}}"></script>
   <script type="text/javascript" src="{{URL::to('js/layouts/SidebarApp.js')}}"></script>

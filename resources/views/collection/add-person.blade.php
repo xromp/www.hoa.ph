@@ -35,7 +35,7 @@
 			<div class="col-md-8 col-md-offset-1" ng-show="vm.response.length">
 				<div class="text-center" ng-class="{'alert alert-success':vm.response[0].status == 200,'alert alert-danger':vm.response[0].status != 200}" ng-bind=vm.response[0].message>
 				</div>
-			</div>					
+			</div>
 		</div>
 	</form>
 

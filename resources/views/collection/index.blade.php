@@ -19,6 +19,9 @@
 <script type="text/ng-template" id="collection.reports.base">
 	@include('collection.reports.base')
 </script>
+<script type="text/ng-template" id="collection.view-details">
+  @include('collection.view-details')
+</script>
 @endsection
 
 

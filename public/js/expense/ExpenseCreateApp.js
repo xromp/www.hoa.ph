@@ -13,13 +13,13 @@ define([
         var vm = this;
 
         vm.collectionDetails = {
-          amount:0,
+          amount:'',
           category:'UTILITIES'
         };
 
         vm.default = function(){
           vm.collectionDetails = {
-            amount:0,
+            amount:'',
             category:'UTILITIES'
           };
         };
@@ -228,8 +228,10 @@ define([
             var formData = angular.toJson(formDataCopy);
             ExpenseCreateSrvcs.savecategory(formData)
             .then(function(response, status){
+              if (response.data.status == 200) {
+                vm.categoryDetails = {};s
+              }
               vm.response.push(response.data);
-
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;
@@ -259,8 +261,10 @@ define([
             var formData = angular.toJson(formDataCopy);
             ExpenseCreateSrvcs.savecategorytype(formData)
             .then(function(response, status){
+              if (response.data.status == 200) {
+                vm.categoryDetails = {};
+              }
               vm.response.push(response.data);
-
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;

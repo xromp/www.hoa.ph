@@ -32,7 +32,7 @@
               <div class="form-group" ng-class="{'has-error': cc.frmCreate.orno.$invalid && cc.frmCreate.withError }">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12">OR No.</label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <input type="number" name="orno" min='1' class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.orno" required>
+                  <input type="number" name="orno" min='1' class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.orno" ng-disabled="cc.collectionDetails.action == 'EDIT'" required>
                   <span class="help-block" ng-show="cc.frmCreate.orno.$invalid && cc.frmCreate.withError">OR No. is required field.</span>
                 </div>
               </div>
@@ -66,23 +66,23 @@
 
             <div class="col-md-6">
 
-              <div class="form-group" ng-class="{'has-error': cc.frmCreate.referenceid.$invalid && cc.frmCreate.withError }">
+              <div class="form-group" ng-class="{'has-error': cc.frmCreate.personid.$invalid && cc.frmCreate.withError }">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">From
                   <span class="required">*</span>
                   <small>(Members/Outside)</small>
                 </label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
                   <p class="input-group">
-                    <select class="form-control" name="referenceid" ng-model="cc.collectionDetails.referenceid" required>
+                    <select class="form-control" name="personid" ng-model="cc.collectionDetails.personid" required>
                       <option value="">Select from <% cc.collectionDetails.type %> ...</option>
-                      <option ng-repeat="ref in cc.refList" ng-bind="ref.name" ng-value="ref.refid"></option>
+                      <option ng-repeat="person in cc.personList" ng-bind="person.name" ng-value="person.personid"></option>
                     </select>
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="cc.addRef(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
+                      <button class="btn btn-success" ng-click="cc.addPerson(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
                     </span>
                   </p>
-                  <!-- <input type="text" name="referenceid" class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.referenceid" required> -->
-                  <span class="help-block" ng-show="cc.frmCreate.referenceid.$invalid && cc.frmCreate.withError">From is required field.</span>
+                  <!-- <input type="text" name="personid" class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.personid" required> -->
+                  <span class="help-block" ng-show="cc.frmCreate.personid.$invalid && cc.frmCreate.withError">From is required field.</span>
                 </div>
               </div>
 
@@ -112,7 +112,7 @@
                   <div class="panel-content">
                     <br>
                     <!-- MONTH DUES-->
-                    <div  ng-if="cc.collectionDetails.category == 'MONTHLYDUES'">
+                    <div  ng-if="cc.collectionDetails.category_code == 'MONTHLYDUES'">
                       <div class="form-group">
                         <div class="pull-right">
                           <button class="btn btn-danger" ng-click="cc.modifyYear('LESS')"><i class="glyphicon glyphicon-plus"></i> Prev Year</button>
@@ -121,7 +121,7 @@
                       </div>
 
                       <div class="form-group" ng-class="{'has-error': cc.frmCreate.entityvalues.$invalid && cc.frmCreate.withError }">
-                        <div class="col-md-4 col-sm-9 col-xs-12" ng-class="{'col-md-offset-3':cc.categoryTypeList[0].year.length < 2}" ng-repeat="yr in cc.categoryTypeList[0].year">
+                        <div class="col-md-4 col-sm-9 col-xs-12" ng-class="{'col-md-offset-3':cc.categoryTypeList[0].year.length < 2}" ng-repeat="yr in cc.categoryTypeList[0].year | orderBy:year">
                           <div class="row form-group" style="margin-bottom: 0px;" ng-repeat="month in cc.categoryTypeList[0].month | filter:{'year':yr}">
                             <label>
                               <input type="checkbox" name="" ng-model="cc.monthSelected[month.name]">
@@ -136,7 +136,7 @@
                     <!-- END MONTHLY DUES -->
 
                     <!--CAR Sticker  -->
-                    <div ng-if="cc.collectionDetails.category == 'CARSTICKER'">
+                    <div ng-if="cc.collectionDetails.category_code == 'CARSTICKER'">
                       <div class="form-group">
                         <div class="form-group" ng-repeat="sticker in cc.stickerDetails">
                           <div class="col-md-4 col-md-offset-3">

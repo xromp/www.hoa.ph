@@ -40,12 +40,13 @@ Route::post('/api/collection/category/create','CollectionCategoryController@crea
 
 // collection reports
 Route::get('/collection/view','CollectionController@index');
-Route::get('/collection/create','CollectionController@index');
 Route::get('/collection/edit/{id}','CollectionController@index');
+Route::get('/collection/create','CollectionController@index');
 Route::get('/collection/reports','CollectionController@index');
 Route::get('/collection/reports/orlisting','CollectionController@reports_orlisting');
 Route::post('/api/collection/get','CollectionController@get');
 Route::post('/api/collection/create','CollectionController@create');
+Route::post('/api/collection/update','CollectionController@update');
 Route::post('/api/collection/delete','CollectionController@delete');
 
 
@@ -82,3 +83,6 @@ Route::post('/api/expense/category/type/get','ExpenseCategoryTypeController@get'
 // Route::group(['middleware' => ['web']], function () {
 
 // });
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
