@@ -51,7 +51,7 @@
               </div>
 
               <div class="form-group" ng-class="{'has-error': cc.frmCreate.amount.$invalid && cc.frmCreate.withError }">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12">Amount Paid. <span class="required">*</span>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">Amount<span class="required">*</span>
                 </label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
                   <input type="number" min="1" name="amount"  class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.amount" required>
@@ -62,6 +62,7 @@
             </div>
           </div>
           <hr>
+
           <div class="row">
 
             <div class="col-md-6">
@@ -72,16 +73,14 @@
                   <small>(Members/Outside)</small>
                 </label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <p class="input-group">
-                    <select class="form-control" name="personid" ng-model="cc.collectionDetails.personid" required>
-                      <option value="">Select from <% cc.collectionDetails.type %> ...</option>
-                      <option ng-repeat="person in cc.personList" ng-bind="person.name" ng-value="person.personid"></option>
-                    </select>
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="cc.addPerson(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
-                    </span>
-                  </p>
-                  <!-- <input type="text" name="personid" class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.personid" required> -->
+                  <%cc.collectionDetails.personid%>
+                  <ui-select name="personid" ng-model="cc.collectionDetails.personid" theme="bootstrap" required>
+                    <ui-select-match placeholder="Select from <% cc.collectionDetails.type %>..."><%cc.collectionDetails.personid.name%></ui-select-match>
+                    <ui-select-choices repeat="item in cc.personList | filter: $select.search">
+                      <div ng-bind-html="item.name | highlight: $select.search"></div>
+                      <small ng-bind-html="item.address | highlight: $select.search"></small>
+                    </ui-select-choices>
+                  </ui-select>
                   <span class="help-block" ng-show="cc.frmCreate.personid.$invalid && cc.frmCreate.withError">From is required field.</span>
                 </div>
               </div>
@@ -178,7 +177,6 @@
 
             </div>
           </div>
-
           <div class="ln_solid"></div>
           <div class="form-group">
             <div class="pull-right">

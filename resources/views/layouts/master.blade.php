@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="{{URL::to('assets/font-awesome/css/font-awesome.min.css')}}">
     <link rel="stylesheet" href="{{URL::to('assets/iCheck/skins/flat/green.css')}}">
     <link rel="stylesheet" href="{{URL::to('assets/custom/css/custom.min.css')}}">
+
+    <link rel="stylesheet" href="{{URL::to('assets/angular-ui-select/dist/select.min.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
     <base href="/">
      <!-- No Cache END-->
   </head>

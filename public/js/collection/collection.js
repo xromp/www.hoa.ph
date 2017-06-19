@@ -5,7 +5,7 @@ define('sims.collection',[
 ], function(angular, dependencyResolver){
 	'use strict';
 	 app = angular
-		.module('sims.collection',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI'])
+		.module('sims.collection',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select'])
 		.config(Config)
 
 		Config.$inject = ['$routeProvider', '$locationProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide', 'blockUIConfig', '$interpolateProvider']
@@ -86,7 +86,8 @@ requirejs(['/js/module-loader/requirejs-config.js'], function (){
 	'angular-block-ui',
 	'angular-animate',
 	'angular-sanitize',
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'angular-ui-select',
   ],function($,angular,app){
 	angular.bootstrap(document, [app.name]);
   });

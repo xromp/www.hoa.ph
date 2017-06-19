@@ -10,6 +10,7 @@ requirejs.config({
     'angular-block-ui':'/assets/angular-block-ui/dist/angular-block-ui.min',
     'angular-animate':'/assets/angular-animate/angular-animate.min',
     'angular-sanitize':'/assets/angular-sanitize/angular-sanitize.min',
+    'angular-ui-select':'/assets/angular-ui-select/dist/select.min',
 
     // Bootstraps
     'bootstrap':'/assets/bootstrap/dist/js/bootstrap.min',
@@ -63,6 +64,9 @@ requirejs.config({
     },
     'angular-sanitize':{
       deps:['angular']
+    },
+    'angular-ui-select':{
+      deps:['angular','angular-sanitize']
     },
     // plugins
     'jquery-smartwizard':{
