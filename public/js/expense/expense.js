@@ -5,7 +5,7 @@ define('sims.expense',[
 ], function(angular, dependencyResolver){
 	'use strict';
 	 app = angular
-		.module('sims.expense',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI'])
+		.module('sims.expense',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select'])
 		.config(Config)
 
 		Config.$inject = ['$routeProvider', '$locationProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide', 'blockUIConfig', '$interpolateProvider']
@@ -18,13 +18,21 @@ define('sims.expense',[
 				service    :$provide.service,
 				blockUI    : blockUIConfig,
 			}
-	    	
-	    	$interpolateProvider.startSymbol('<%');
-    		$interpolateProvider.endSymbol('%>');
+				
+				$interpolateProvider.startSymbol('<%');
+				$interpolateProvider.endSymbol('%>');
 			
 			$locationProvider.html5Mode(true);
 			$routeProvider
 			.when('/expense/create',{
+				templateUrl:'expense.create',
+				controller:'ExpenseCreateCtrl',
+				controllerAs:'p',
+				resolve:dependencyResolver([
+					'/js/expense/ExpenseCreateApp.js'
+				])
+			})
+			.when('/expense/edit/:id',{
 				templateUrl:'expense.create',
 				controller:'ExpenseCreateCtrl',
 				controllerAs:'p',
@@ -52,24 +60,24 @@ define('sims.expense',[
 			})
 			.otherwise({template:'<p>Wrong Url.</p>'})
 
-            var markUp = '';
-            markUp += '<div class="block-ui-overlay">'
-            markUp += '</div>'
-            markUp += '<div class="block-ui-message-container">'
-            markUp += '  <div class="block-ui-message" style="color: black!important;font-size: 13px;background-color: transparent;">'
-            markUp += '    <i class="fa fa-circle-o-notch fa-spin"></i> Loading... '
-            markUp += '    </div>'
-            markUp += '</div>'
+						var markUp = '';
+						markUp += '<div class="block-ui-overlay">'
+						markUp += '</div>'
+						markUp += '<div class="block-ui-message-container">'
+						markUp += '  <div class="block-ui-message" style="color: black!important;font-size: 13px;background-color: transparent;">'
+						markUp += '    <i class="fa fa-circle-o-notch fa-spin"></i> Loading... '
+						markUp += '    </div>'
+						markUp += '</div>'
 
-            blockUIConfig.message='loading message from module';
-            blockUIConfig.template = markUp;
-            blockUIConfig.autoInjectBodyBlock = false;
+						blockUIConfig.message='loading message from module';
+						blockUIConfig.template = markUp;
+						blockUIConfig.autoInjectBodyBlock = false;
 		}
 
 	return app;
 });
 requirejs(['/js/module-loader/requirejs-config.js'], function (){
-  requirejs([
+	requirejs([
 	'jquery',
 	'angular',
 	'sims.expense',
@@ -78,8 +86,9 @@ requirejs(['/js/module-loader/requirejs-config.js'], function (){
 	'angular-block-ui',
 	'angular-animate',
 	'angular-sanitize',
-	'ui.bootstrap'
-  ],function($,angular,app){
+	'ui.bootstrap',
+	'angular-ui-select',
+	],function($,angular,app){
 	angular.bootstrap(document, [app.name]);
-  });
+	});
 });

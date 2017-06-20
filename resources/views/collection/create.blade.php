@@ -73,32 +73,30 @@
                   <small>(Members/Outside)</small>
                 </label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <%cc.collectionDetails.personid%>
-                  <ui-select name="personid" ng-model="cc.collectionDetails.personid" theme="bootstrap" required>
-                    <ui-select-match placeholder="Select from <% cc.collectionDetails.type %>..."><%cc.collectionDetails.personid.name%></ui-select-match>
-                    <ui-select-choices repeat="item in cc.personList | filter: $select.search">
-                      <div ng-bind-html="item.name | highlight: $select.search"></div>
-                      <small ng-bind-html="item.address | highlight: $select.search"></small>
+                  <ui-select class="col-md-10" name="personid" ng-model="cc.collectionDetails.personid" theme="bootstrap" required>
+                    <ui-select-match placeholder="Select from <% cc.collectionDetails.type %>..."><% $select.selected.name%></ui-select-match>
+                    <ui-select-choices repeat="person.personid as person in cc.personList | filter: $select.search">
+                      <div ng-bind-html="person.name | highlight: $select.search"></div>
+                      <small ng-bind-html="person.address | highlight: $select.search"></small>
                     </ui-select-choices>
                   </ui-select>
+                  <button class="btn btn-success" ng-click="cc.addPerson(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
                   <span class="help-block" ng-show="cc.frmCreate.personid.$invalid && cc.frmCreate.withError">From is required field.</span>
                 </div>
               </div>
+
 
               <div class="form-group" ng-class="{'has-error': cc.frmCreate.category.$invalid && cc.frmCreate.withError }">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Category <span class="required">*</span>
                 </label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <p class="input-group">
-                    <select class="form-control" name="category" ng-model="cc.collectionDetails.category_code" ng-init="cc.getCategoryTypeList(cc.collectionDetails)" ng-change="cc.getCategoryTypeList(cc.collectionDetails)" required>
-                      <option ng-repeat="category in cc.categoryList" ng-bind="category.description" ng-value="category.code"></option>
-                    </select>
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="cc.addCategory(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
-                    </span>
-                  </p>
-                  <!-- <input type="text" name="type"  
-                  class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.category" required> -->
+                  <ui-select class="col-md-10" name="category" ng-model="cc.collectionDetails.category_code" theme="bootstrap" ng-init="cc.getCategoryTypeList(cc.collectionDetails)" ng-change="cc.getCategoryTypeList(cc.collectionDetails)" required>
+                    <ui-select-match placeholder="Select from <% cc.collectionDetails.type %>..."><% $select.selected.description%></ui-select-match>
+                    <ui-select-choices repeat="category.code as category in cc.categoryList | filter: $select.search">
+                      <div ng-bind-html="category.description | highlight: $select.search"></div>
+                    </ui-select-choices>
+                  </ui-select>
+                  <button class="btn btn-success" ng-click="cc.addCategory(cc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
                   <span class="help-block" ng-show="cc.frmCreate.category.$invalid && cc.frmCreate.withError">Categorys is required field.</span>
                 </div>
               </div>
@@ -136,13 +134,15 @@
 
                     <!--CAR Sticker  -->
                     <div ng-if="cc.collectionDetails.category_code == 'CARSTICKER'">
-                      <div class="form-group">
+                      <div class="form-group" ng-class="{'has-error': (cc.frmCreate.stickerid.$invalid || cc.frmCreate.plateno.$invalid) && cc.frmCreate.withError }">
                         <div class="form-group" ng-repeat="sticker in cc.stickerDetails">
                           <div class="col-md-4 col-md-offset-3">
-                            <input type="text" name="stickerid" class="form-control" ng-model="sticker.stickerid" placeholder="Sticker ID">
+                            <input type="text" name="stickerid" class="form-control" ng-model="sticker.stickerid" placeholder="Sticker ID" required>
+                            <small class="help-block" ng-show="cc.frmCreate.stickerid.$invalid && cc.frmCreate.withError">Sticker ID is required field.</small>
                           </div>
                           <div class="col-md-4">
-                            <input type="text" name="stickerid" class="form-control" ng-model="sticker.plateno" placeholder="Plate No.">
+                            <input type="text" name="plateno" class="form-control" ng-model="sticker.plateno" placeholder="Plate No." required>
+                            <small class="help-block" ng-show="cc.frmCreate.plateno.$invalid && cc.frmCreate.withError">Plate No. is required field.</small>
                           </div>
                           <div class="pull-right" ng-if="!$first">
                             <button class="btn btn-danger btn-xs" ng-click="cc.removeCarSticker($index)">X</button>

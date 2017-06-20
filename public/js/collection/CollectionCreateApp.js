@@ -11,7 +11,6 @@ define([
       CollectionCreateCtrl.$inject = ['$scope', '$window', '$filter', '$routeParams', 'CollectionCreateSrvcs','$uibModal','blockUI', '$http']
       function CollectionCreateCtrl($scope, $window, $filter, $routeParams, CollectionCreateSrvcs, $uibModal, blockUI, $http){
         var vm = this;
-
         vm.collectionDetails = {
           type:'HOMEOWNER',
           qty:1,
@@ -167,6 +166,11 @@ define([
 
                 angular.forEach(vm.collectionDetails.entityvalues, function(v, k){
                   vm.monthSelected[v.entityvalue1+'-'+v.entityvalue2] = true;
+                });
+              } else if (vm.collectionDetails.category_code == 'CARSTICKER') {
+                vm.stickerDetails = [];
+                angular.forEach(vm.collectionDetails.entityvalues, function(v, k){
+                  vm.stickerDetails.push({stickerid:v.entityvalue1, plateno:v.entityvalue2});
                 });
               }
             }

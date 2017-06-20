@@ -6,13 +6,13 @@ define([
     app.lazy.controller('ModalInfoInstanceCtrl',ModalInfoInstanceCtrl)
     app.lazy.factory('ExpenseViewSrvcs', ExpenseViewSrvcs)
 
-      ExpenseViewCtrl.$inject = ['$scope', '$filter', 'ExpenseViewSrvcs','$uibModal','blockUI', '$http']
-      function ExpenseViewCtrl($scope, $filter, ExpenseViewSrvcs, $uibModal, blockUI, $http){
+      ExpenseViewCtrl.$inject = ['$scope', '$filter', '$window', 'ExpenseViewSrvcs','$uibModal','blockUI', '$http']
+      function ExpenseViewCtrl($scope, $filter, $window, ExpenseViewSrvcs, $uibModal, blockUI, $http){
         var vm = this;
 
         vm.query = {
-          'startdate':new Date(),
-          'enddate':new Date(),
+          'startdate':'',
+          'enddate':'',
           'posted':0,
         };
 
@@ -80,7 +80,7 @@ define([
         };
 
         vm.edit = function(i) {
-
+          $window.location.href='/expense/edit/'+i.expenseid;
         };
 
         vm.remove = function(i) {

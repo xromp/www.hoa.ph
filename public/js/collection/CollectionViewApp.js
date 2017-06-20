@@ -12,8 +12,8 @@ define([
         var vm = this;
 
         vm.query = {
-          'startdate':new Date(),
-          'enddate':new Date(),
+          'startdate':'',
+          'enddate':'',
           'posted':false,
           'orno':''
         };
@@ -53,7 +53,6 @@ define([
           var formDataCopy = angular.copy(i)
           formDataCopy.refid = formDataCopy.orno;
           formDataCopy.refdate = $filter('date')(formDataCopy.ordate,'yyyy-MM-dd');
-          formDataCopy.amount = formDataCopy.amount_paid;
           formDataCopy.trantype = 'COLLECTION';
 
           var formData = angular.toJson(formDataCopy);
@@ -134,6 +133,7 @@ define([
             controller:'CollectionDetailsInstanceCtrl',
             templateUrl:'collection.view-details',
             controllerAs: 'vm',
+            backdrop: 'static',
             resolve :{
               formData: function () {
                 return {
@@ -146,8 +146,7 @@ define([
           });
 
           modalInstance.result.then(function (){
-          },function (){
-          });
+          },function () {});
         }
 
         vm.init();
@@ -191,18 +190,20 @@ define([
           
           formDataCopy.refid = formDataCopy.orno;
           formDataCopy.refdate = $filter('date')(formDataCopy.ordate,'yyyy-MM-dd');
-          formDataCopy.amount = formDataCopy.amount_paid;
           formDataCopy.trantype = 'COLLECTION';
 
           var formData = angular.toJson(formDataCopy);
           CollectionViewSrvcs.post(formData)
           .then(function(response, status){
             vm.response = response.data;
+            if (response.data.status == 200) {
+              vm.formData.formData.posted =1;
+            }
           },function(){alert('Error occured')});
         };
 
         vm.cancel = function() {
-          $uibModalInstance.dismiss('cancel');
+          $uibModalInstance.dismiss(vm.formData.formData);
         };
 
         vm.zeroPad = function(num, places) {

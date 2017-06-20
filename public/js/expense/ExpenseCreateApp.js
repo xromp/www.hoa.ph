@@ -8,32 +8,36 @@ define([
     app.lazy.controller('CategoryTypeModalCrtl',CategoryTypeModalCrtl)
     app.lazy.factory('ExpenseCreateSrvcs', ExpenseCreateSrvcs)
 
-      ExpenseCreateCtrl.$inject = ['$scope', '$filter', 'ExpenseCreateSrvcs','$uibModal','blockUI', '$http']
-      function ExpenseCreateCtrl($scope, $filter, ExpenseCreateSrvcs, $uibModal, blockUI, $http){
+      ExpenseCreateCtrl.$inject = ['$scope', '$filter', '$window','$routeParams','ExpenseCreateSrvcs','$uibModal','blockUI', '$http']
+      function ExpenseCreateCtrl($scope, $filter, $window, $routeParams, ExpenseCreateSrvcs, $uibModal, blockUI, $http){
         var vm = this;
-
-        vm.collectionDetails = {
-          amount:'',
-          category:'UTILITIES'
-        };
 
         vm.default = function(){
           vm.collectionDetails = {
             amount:'',
-            category:'UTILITIES'
+            category:'',
+            action:'CREATE'
           };
         };
+        vm.default();
+
+        if ($routeParams.id) {
+          vm.collectionDetails.action = 'UPDATE';
+          vm.collectionDetails.expenseid = $routeParams.id;
+        }
 
         vm.init  = function() {
-          vm.default();
           vm.getCategoryList();
 
-          // vm.categoryTypeList = [
-          //   {'code':'LIGHT','description':'Light','category':'UTILITIES'},
-          //   {'code':'WATER','description':'Water','category':'UTILITIES'},
-          //   {'code':'TELEPHONE','description':'Telephone','category':'UTILITIES'},
-          //   {'code':'GASOLINE','description':'Gasoline Roving/OB','category':'GASOLINE'},
-          // ];
+          if (vm.collectionDetails.action == 'UPDATE') {
+            var data = {
+              'posted':0,
+              'action':'EDIT',
+              'expenseid':vm.collectionDetails.expenseid
+            };
+
+            vm.get(data);
+          }
         };
 
         vm.submit = function (data) {
@@ -49,29 +53,6 @@ define([
               'entityvalue3':''
             });
 
-
-            // if (data.category == 'MONTHLYDUES') {
-            //   angular.forEach(vm.monthSelected, function(v, k){
-            //     if (v) {
-            //       dataCopy.entityvalues.push({
-            //         'entityvalue1':k.split('-')[0],
-            //         'entityvalue2':k.split('-')[1],
-            //         'entityvalue3':''
-            //       })
-            //     }
-            //   });
-            // } else if (data.category == 'CARSTICKER') {
-            //   angular.forEach(vm.stickerDetails, function(v, k) {
-            //     if (v) {
-            //       dataCopy.entityvalues.push({
-            //         'entityvalue1':v.stickerid,
-            //         'entityvalue2':v.plateno,
-            //         'entityvalue3':''
-            //       });
-            //     }
-            //   });
-            // }
-            
             var appBlockUI = blockUI.instances.get('blockUI');
             appBlockUI.start();
 
@@ -110,16 +91,68 @@ define([
           }
         };
 
+        vm.update = function (data) {
+          if (vm.frmCreate.$valid) {
+            vm.frmCreate.withError = false;
+            
+            var dataCopy = angular.copy(data);
+            dataCopy.ordate = $filter('date')(dataCopy.ordate,'yyyy-MM-dd');
+            dataCopy.entityvalues = [];
+            dataCopy.entityvalues.push({
+              'entityvalue1':dataCopy.categoryType,
+              'entityvalue2':'',
+              'entityvalue3':''
+            });
+            
+            var appBlockUI = blockUI.instances.get('blockUI');
+            appBlockUI.start();
+
+            var formData = angular.toJson(dataCopy);
+            ExpenseCreateSrvcs.update(formData)
+            .then (function (response) {
+              if (response.data.status == 200) {
+                
+                vm.default();
+              } else {
+
+              }
+              var modalInstance = $uibModal.open({
+                  controller:'ModalInfoInstanceCtrl',
+                  templateUrl:'shared.modal.info',
+                  controllerAs: 'vm',
+                  resolve :{
+                    formData: function () {
+                      return {
+                        title: 'Expense Entry',
+                        message: response.data.message
+                      };
+                    }
+                  }
+                });
+
+                modalInstance.result.then(function (){
+                },function (){
+                });
+              appBlockUI.stop();
+            },function(){alert("Error occured!");
+              appBlockUI.stop();
+            });
+          } else {
+            vm.frmCreate.withError = true;
+          }
+        };
+
         vm.get = function (data) {
           var dataCopy = angular.copy(data)
-          data.person00id = 1;
-          var formData = angular.toJson(dataCopy);
 
+          var formData = angular.toJson(dataCopy);
           ExpenseCreateSrvcs.get(data)
           .then (function (response) {
-            if (response.status == 200) {
+            if (response.data.status == 200) {
+              vm.collectionDetails = response.data.data[0];
+              vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
+              vm.collectionDetails.amount = parseFloat(vm.collectionDetails.amount);
             }
-
           },function(){ alert("Bad Request!")})
         };
 
@@ -128,7 +161,8 @@ define([
         };
 
         vm.cancel = function () {
-          $scope.$parent.$parent.ec.templateUrl ='expense.view';
+          // $scope.$parent.$parent.ec.templateUrl ='expense.view';
+          $window.location.href = '/expense/view';
         };
       
         vm.getCategoryList = function() {
@@ -151,7 +185,7 @@ define([
           ExpenseCreateSrvcs.getcategorytype(formData)
           .then(function(response, status){
             if (response.status == 200) {
-              vm.categoryTypeList = response.data.data;    
+              vm.categoryTypeList = response.data.data;
             }
           }, function(){
             alert('Error!')
@@ -300,11 +334,19 @@ define([
               headers: {'Content-Type': 'application/json'}
             })
           },
+          update: function(data) {
+            return $http({
+              method:'POST',
+              url:'/api/expense/update',
+              data:data,
+              headers:{'Content-Type':'application/json'}
+            })
+          },
           get: function(data) {
             return $http({
-              method:'GET',
+              method:'POST',
               data:data,
-              url: baseUrlApi + '/api/person?person00id='+ data.person00id,
+              url: '/api/expense/get',
               headers: {'Content-Type': 'application/json'}
             })
           },

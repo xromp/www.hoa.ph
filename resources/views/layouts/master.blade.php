@@ -21,6 +21,7 @@
 
     <link rel="stylesheet" href="{{URL::to('assets/angular-ui-select/dist/select.min.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
     <base href="/">
      <!-- No Cache END-->
   </head>

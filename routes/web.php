@@ -60,8 +60,11 @@ Route::post('/api/transaction/post','TransactionController@post');
 
 // expenses
 Route::get('/expense/view','ExpenseController@index');
+Route::get('/expense/create','ExpenseController@index');
+Route::get('/expense/edit/{id}','ExpenseController@index');
 Route::post('/api/expense/get','ExpenseController@get');
 Route::post('/api/expense/create','ExpenseController@create');
+Route::post('/api/expense/update','ExpenseController@update');
 Route::post('/api/expense/delete','ExpenseController@delete');
 Route::get('/api/expense/category/get','ExpenseCategoryController@get');
 Route::post('/api/expense/category/create','ExpenseCategoryController@create');

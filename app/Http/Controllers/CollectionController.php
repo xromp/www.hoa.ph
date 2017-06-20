@@ -15,43 +15,43 @@ class CollectionController extends Controller
 {
     public function index()
     {
-    	return view('collection.index')	;
+        return view('collection.index') ;
     }
 
     public function create(Request $request)
     {
         $message = '';
 
-    	$validator = Validator::make($request->all(),[
-			'amount'=> 'required',
-    		'category_code'=> 'required',
-    		'entityvalues'=> 'required',
-    		'ordate'=> 'required',
-    		'orno'=> 'required',
-    		'orno'=> 'required',
-    		'personid'=> 'required',
-    		'type'=> 'required'
-		]);
+        $validator = Validator::make($request->all(),[
+            'amount'=> 'required',
+            'category_code'=> 'required',
+            'entityvalues'=> 'required',
+            'ordate'=> 'required',
+            'orno'=> 'required',
+            'orno'=> 'required',
+            'personid'=> 'required',
+            'type'=> 'required'
+        ]);
 
-    	if ($validator-> fails()) {
-	        return response()->json([
+        if ($validator-> fails()) {
+            return response()->json([
                 'status'=> 403,
                 'data'=>'',
                 'message'=>'Unable to save.'
             ]);
 
-    	} else {
+        } else {
             $collection = new Collection;
-        	$collection_line = new Collection_line;
+            $collection_line = new Collection_line;
 
             $data = array();
-            $data['orno'] 			= $request-> input('orno');
-            $data['ordate'] 		= $request-> input('ordate');
-            $data['type']			= $request-> input('type');
-            $data['personid'] 	    = $request-> input('personid');
-            $data['category_code'] 	= $request-> input('category_code');
-            $data['amount'] 	= $request-> input('amount');
-            $data['entityvalues'] 	= $request-> input('entityvalues');
+            $data['orno']           = $request-> input('orno');
+            $data['ordate']         = $request-> input('ordate');
+            $data['type']           = $request-> input('type');
+            $data['personid']       = $request-> input('personid');
+            $data['category_code']  = $request-> input('category_code');
+            $data['amount']     = $request-> input('amount');
+            $data['entityvalues']   = $request-> input('entityvalues');
             $data['remarks']        = $request-> input('remarks');
 
             $isOrnoExist = $collection
@@ -66,42 +66,44 @@ class CollectionController extends Controller
                     'message'=>"OR no. {$data['orno']} is already exists."
                 ]);         
             } else {
-            	// saving collections
-            	DB::transaction(function($data) use($data){
-            		// dd($data['orno']);
-            		$collection = new Collection;
-	            	
-	            	$collection->orno 			= $data['orno'];
-	            	$collection->ordate 		= $data['ordate'];
-	            	$collection->type 			= $data['type'];
-	            	$collection->personid 	    = $data['personid'];
-	            	$collection->category 	    = $data['category_code'];
-	            	$collection->amount 	    = $data['amount'];
+                // saving collections
+                DB::transaction(function($data) use($data){
+                    // dd($data['orno']);
+                    $collection = new Collection;
+                    
+                    $collection->orno           = $data['orno'];
+                    $collection->ordate         = $data['ordate'];
+                    $collection->type           = $data['type'];
+                    $collection->personid       = $data['personid'];
+                    $collection->category       = $data['category_code'];
+                    $collection->amount         = $data['amount'];
                     $collection->remarks        = $data['remarks'];
-        		    
-	            	$collection->save();
+                    
+                    $collection->save();
 
-	            	if($collection->id && $data['entityvalues'][0]['entityvalue1'])
-				    {
-		            	foreach ($data['entityvalues'] as $key => $entityvalue) {
-		            		$collection_line = new Collection_line;
+                    if($collection->id)
+                    {
+                        if ($data['entityvalues'][0]['entityvalue1']) {
+                            foreach ($data['entityvalues'] as $key => $entityvalue) {
+                                $collection_line = new Collection_line;
 
-			            	$collection_line->collectionid = $collection->id;
-			            	$collection_line->entityvalue1 = $entityvalue['entityvalue1'];
-			            	$collection_line->entityvalue2 = $entityvalue['entityvalue2'];
-			            	$collection_line->entityvalue3 = $entityvalue['entityvalue3'];
-		            		$collection_line->save();
+                                $collection_line->collectionid = $collection->id;
+                                $collection_line->entityvalue1 = $entityvalue['entityvalue1'];
+                                $collection_line->entityvalue2 = $entityvalue['entityvalue2'];
+                                $collection_line->entityvalue3 = $entityvalue['entityvalue3'];
+                                $collection_line->save();
 
-		            		if (!$collection_line->id) {
-		            			throw new \Exception('Collection line not created.');
-		            		}
-	            		} 
-	            	}
-	            	else 
-	            	{
-				        throw new \Exception('Collection not created.');
-	            	}
-            	});
+                                if (!$collection_line->id) {
+                                    throw new \Exception('Collection line not created.');
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        throw new \Exception('Collection not created.');
+                    }
+                });
 
             }
 
@@ -109,8 +111,8 @@ class CollectionController extends Controller
                 'status'=> 200,
                 'data'=>'',
                 'message'=>'Successfully saved.'
-            ]);    		
-    	}    
+            ]);         
+        }    
     }
 
     public function update(Request $request)
@@ -240,7 +242,8 @@ class CollectionController extends Controller
                 'posted',
                 'posted',
                 'collection.deleted',
-                'remarks')
+                'remarks',
+                'collection.created_at')
             -> leftjoin('collection_category','collection_category.code','=','collection.category')
             -> leftjoin('person', 'person.personid','=','collection.personid')
             -> where('collection.deleted',0)

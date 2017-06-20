@@ -3,7 +3,6 @@
   </div>
 
   <div class="row">
-
     <div class="col-md-6">
 
       <div class="form-group" ng-class="{'has-error': ecc.frmCreate.orno.$invalid && ecc.frmCreate.withError }">
@@ -58,15 +57,14 @@
         <label class="control-label col-md-3 col-sm-3 col-xs-12">Category <span class="required">*</span>
         </label>
         <div class="col-md-9 col-sm-9 col-xs-12">
-          <p class="input-group">
-            <select class="form-control" name="category" ng-model="ecc.collectionDetails.category" ng-init="ecc.getCategoryTypeList(ecc.collectionDetails)" ng-change="ecc.getCategoryTypeList(ecc.collectionDetails)" required>
-              <option ng-repeat="category in ecc.categoryList" ng-bind="category.description" ng-value="category.code"></option>
-            </select>
-            <span class="input-group-btn">
-              <button class="btn btn-success" ng-click="ecc.addCategory(ec.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
-            </span>
-          </p>
-          <span class="help-block" ng-show="ecc.frmCreate.category.$invalid && ecc.frmCreate.withError">Categorys is required field.</span>
+          <ui-select class="col-md-10" name="category" ng-model="ecc.collectionDetails.category" theme="bootstrap" ng-init="ecc.getCategoryTypeList(ecc.collectionDetails)" ng-change="ecc.getCategoryTypeList(ecc.collectionDetails)" required>
+            <ui-select-match placeholder="Select from category list..."><% $select.selected.description%></ui-select-match>
+            <ui-select-choices repeat="category.code as category in ecc.categoryList | filter: $select.search">
+              <div ng-bind-html="category.description | highlight: $select.search"></div>
+            </ui-select-choices>
+          </ui-select>
+          <button class="btn btn-success" ng-click="ecc.addCategory(ec.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
+          <span class="help-block" ng-show="ecc.frmCreate.category.$invalid && ecc.frmCreate.withError">Category is required field.</span>
         </div>
       </div>
 
@@ -74,20 +72,16 @@
         <label class="control-label col-md-3 col-sm-3 col-xs-12">Category type<span class="required">*</span>
         </label>
         <div class="col-md-9 col-sm-9 col-xs-12">
-          <p class="input-group">
-            <select class="form-control" name="categorytype" ng-model="ecc.collectionDetails.categoryType" required>
-              <option ng-repeat="categorytype in ecc.categoryTypeList" ng-bind="categorytype.description" ng-value="categorytype.code"></option>
-            </select>
-            <span class="input-group-btn">
-              <button class="btn btn-success" ng-click="ecc.addCategoryType(ecc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
-            </span>
-          </p>
-          <span class="help-block" ng-show="ecc.frmCreate.categorytype.$invalid && ecc.frmCreate.withError">Categorys is required field.</span>
+          <ui-select class="col-md-10" name="categorytype" ng-model="ecc.collectionDetails.category_type_code" theme="bootstrap" required>
+            <ui-select-match placeholder="Select from type list..."><% $select.selected.description%></ui-select-match>
+            <ui-select-choices repeat="categorytype.code as categorytype in ecc.categoryTypeList | filter: $select.search">
+              <div ng-bind-html="categorytype.description | highlight: $select.search"></div>
+            </ui-select-choices>
+          </ui-select>
+          <button class="btn btn-success" ng-click="ecc.addCategoryType(ecc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
+          <span class="help-block" ng-show="ecc.frmCreate.categorytype.$invalid && ecc.frmCreate.withError">Type is required field.</span>
         </div>
       </div>
-
-
-
     </div>
 
     <div class="col-md-6">
@@ -104,7 +98,8 @@
   <div class="ln_solid"></div>
   <div class="form-group">
     <div class="pull-right">
-      <button type="submit" class="btn btn-success" ng-click="ecc.submit(ecc.collectionDetails)">Submit</button>
+      <button type="submit" class="btn btn-success" ng-if="ecc.collectionDetails.action == 'CREATE'" ng-click="ecc.submit(ecc.collectionDetails)">Submit</button>
+      <button type="submit" class="btn btn-success" ng-if="ecc.collectionDetails.action == 'UPDATE'" ng-click="ecc.update(ecc.collectionDetails)">Update</button>
       <button type="button" class="btn btn-default" ng-click="ecc.cancel()">Cancel</button>
     </div>
   </div>
