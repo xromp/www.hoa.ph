@@ -42,7 +42,19 @@
       <div class="x_content">
         <br />
         <form name="p.frmCreate" class="form-horizontal form-label-left" novalidate>
-          <h4>Person Info</h4>
+          <h4>Personal Information</h4>
+          <div class="row">
+            <label class="col-md-1">
+              <input type="radio" name="status" ng-model="p.personInfo.status" style="zoom:1.2;" value="SINGLE">
+              Single
+            </label>
+            <label class="col-md-1">
+              <input type="radio" name="status" ng-model="p.personInfo.status" style="zoom:1.2;" value="MARRIED">
+              Married
+            </label>
+          </div>
+          <hr>
+          <h5 ng-if="p.personInfo.status == 'MARRIED'"><strong>(Husband)</strong></h5>
           <div class="row">
             <div class="col-md-4">
               <div class="form-group" ng-class="{'has-error': p.frmCreate.lname.$invalid && p.frmCreate.withError }">
@@ -71,30 +83,91 @@
           </div>
 
           <div class="row">
+
             <div class="col-md-4">
               <label class="control-label">Birthday</label>
               <p class="input-group">
-                <input type="text" class="form-control" name="birthday" uib-datepicker-popup="MM/dd/yyyy" ng-model="p.personInfo.birthday" is-open="p.dtIsOpen" datepicker-options="dateOptions" close-text="Close" alt-input-formats="altInputFormats"/>
+                <input type="text" class="form-control" name="birthday" uib-datepicker-popup="MM/dd/yyyy" ng-model="p.personInfo.birthday" is-open="p.dtIsOpen1" datepicker-options="dateOptions" close-text="Close" alt-input-formats="altInputFormats"/>
                 <span class="input-group-btn">
-                  <button type="button" class="btn btn-default" ng-click="p.datepickerOpen(p)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  <button type="button" class="btn btn-default" ng-click="p.datepickerOpen(p,1)"><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
               </p>
             </div>
+
             <div class="col-md-4">
-              <div class="form-group" ng-class="{'has-error': p.frmCreate.gender.$invalid && p.frmCreate.withError }">
-                <label class="control-label">Gender</label>
-                <div class="col-md-12">
-                  <label class="col-md-4">
-                    <input type="radio" name="gender" ng-model="p.personInfo.gender" value="MALE" required> Male
-                  </label>
-                  <label class="col-md-4">
-                    <input type="radio" name="gender" ng-model="p.personInfo.gender" value="FEMALE" required> Female
-                  </label>
-                </div>
-                <span class="help-block" ng-show="p.frmCreate.gender.$invalid && p.frmCreate.withError">Gender is required field.</span>
+              <div class="form-group" ng-class="{'has-error': p.frmCreate.contact_mobileno.$invalid && p.frmCreate.withError }">
+                <label class="control-label">Mobile No.</label>
+                <input type="text" name="mobileno" class="form-control" ng-model="p.personInfo.contact_mobileno" placeholder="+639000000000">
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group" ng-class="{'has-error': p.frmCreate.email.$invalid && p.frmCreate.withError }">
+                <label class="control-label">Email</label>
+                <input type="email" name="email" class="form-control" ng-model="p.personInfo.email" placeholder="sample@sample.com">
+                <span class="help-block" ng-show="p.frmCreate.$error.email && p.frmCreate.withError">Not valid email.</span>
               </div>
             </div>
           </div>
+          <div ng-if="p.personInfo.status == 'MARRIED'">
+            <hr>
+            <h5><strong>(Wife)</strong></h5>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_lname.$invalid && p.frmCreate.withError }">
+                  <label class="control-label">Last Name <span class="required">*</span>
+                  </label>
+                  <input type="text" name="wife_lname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_lname" required>
+                    <span class="help-block" ng-show="p.frmCreate.wife_lname.$invalid && p.frmCreate.withError">Last name is required field.</span>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_fname.$invalid && p.frmCreate.withError }">
+                  <label class="control-label">First Name <span class="required">*</span>
+                  </label>
+                  <input type="text" name="wife_fname"  class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_fname" required>
+                  <span class="help-block" ng-show="p.frmCreate.wife_fname.$invalid && p.frmCreate.withError">First name is required field.</span>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label">Middle Name / Initial</label>
+                  <input type="text" name="wife_mname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_mname">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+
+              <div class="col-md-4">
+                <label class="control-label">Birthday</label>
+                <p class="input-group">
+                  <input type="text" class="form-control" name="wife_birthday" uib-datepicker-popup="MM/dd/yyyy" ng-model="p.personInfo.wife_birthday" is-open="p.dtIsOpen2" datepicker-options="dateOptions" close-text="Close" alt-input-formats="altInputFormats"/>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="p.datepickerOpen(p,2)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+                </p>
+              </div>
+
+              <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_contact_mobileno.$invalid && p.frmCreate.withError }">
+                  <label class="control-label">Mobile No.</label>
+                  <input type="text" name="mobileno" class="form-control" ng-model="p.personInfo.wife_contact_mobileno" placeholder="+639000000000">
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_email.$invalid && p.frmCreate.withError }">
+                  <label class="control-label">Email</label>
+                  <input type="wife_email" name="wife_email" class="form-control" ng-model="p.personInfo.wife_email" placeholder="sample@sample.com">
+                  <span class="help-block" ng-show="p.frmCreate.$error.wife_email && p.frmCreate.withError">Not valid email.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr>
 
           <div class="row">
             <div class="col-md-4">
@@ -122,39 +195,22 @@
 
           <div class="row">
             <div class="col-md-4">
-              <div class="form-group" ng-class="{'has-error': p.frmCreate.contact_mobileno.$invalid && p.frmCreate.withError }">
-                <label class="control-label">Mobile No.</label>
-                <input type="text" name="mobileno" class="form-control" ng-model="p.personInfo.contact_mobileno" placeholder="+639000000000">
-              </div>
-            </div>
-
-            <div class="col-md-4">
               <div class="form-group" ng-class="{'has-error': p.frmCreate.contact_telephoneno.$invalid && p.frmCreate.withError }">
-                <label class="control-label">Telephone No.</label>
+                <label class="control-label">Landline No.</label>
                 <input type="text" name="telephone" class="form-control" ng-model="p.personInfo.contact_telephoneno" placeholder="000-000">
               </div>
             </div>
-
-
-            <div class="col-md-4">
-              <div class="form-group" ng-class="{'has-error': p.frmCreate.email.$invalid && p.frmCreate.withError }">
-                <label class="control-label">Email</label>
-                <input type="email" name="email" class="form-control" ng-model="p.personInfo.email" placeholder="sample@sample.com">
-                <span class="help-block" ng-show="p.frmCreate.$error.email && p.frmCreate.withError">Not valid email.</span>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label">Year moved to Green Ridge</label>
+                  <input type="text" name="year_moved" class="form-control" ng-model="p.personInfo.year_moved">
+                </div>
               </div>
             </div>
-
           </div>
 
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label class="control-label">Year moved to Green Ridge</label>
-                <input type="text" name="year_moved" class="form-control" ng-model="p.personInfo.year_moved">
-              </div>
-            </div>
-            
-          </div>
+
           <hr>
 
           <h4>Authorized Representative</h4>
@@ -163,7 +219,7 @@
             <div class="col-md-4">
               <div class="form-group" ng-class="{'has-error': p.frmCreate.representative.$invalid && p.frmCreate.withError }">
                 <label class="control-label">Name</label>
-                <input type="text" name="representative" class="form-control" ng-model="p.personInfo.representative" placeholder="Firstname Lastname">
+                <input type="text" name="representative" class="form-control" ng-model="p.personInfo.representative" placeholder="Lastname, Firstname">
               </div>  
             </div>
 

@@ -44,7 +44,7 @@ class ExpenseController extends Controller
                 'deleted',
                 'expense.created_at')
             -> leftjoin('expense_category','expense_category.code','=','expense.category')
-            -> leftjoin('expense_category_type','expense_category.code','=','expense_category_type.code')
+            -> leftjoin('expense_category_type','expense.category_type','=','expense_category_type.code')
             -> where('deleted',0)
             ->where('posted',$formData['posted']);
 
@@ -68,12 +68,13 @@ class ExpenseController extends Controller
         $message = '';
 
         $validator = Validator::make($request->all(),[
-            'amount'=> 'required',
-            'category'=> 'required',
-            'entityvalues'=> 'required',
-            'ordate'=> 'required',
-            'orno'=> 'required',
-            'establishment'=> 'required',
+            'amount'                => 'required',
+            'category_code'         => 'required',
+            'category_type_code'    => 'required',
+            'entityvalues'          => 'required',
+            'ordate'                => 'required',
+            'orno'                  => 'required',
+            'establishment'         => 'required',
         ]);
 
         if ($validator-> fails()) {
@@ -88,13 +89,14 @@ class ExpenseController extends Controller
             $expenses_line = new Expense_line;
 
             $data = array();
-            $data['orno']           = $request-> input('orno');
-            $data['ordate']         = $request-> input('ordate');
-            $data['category']       = $request-> input('category');
-            $data['amount']         = $request-> input('amount');
-            $data['entityvalues']   = $request-> input('entityvalues');
-            $data['remarks']        = $request-> input('remarks');
-            $data['establishment']  = $request-> input('establishment');
+            $data['orno']               = $request-> input('orno');
+            $data['ordate']             = $request-> input('ordate');
+            $data['category_code']      = $request-> input('category_code');
+            $data['category_type_code'] = $request-> input('category_type_code');
+            $data['amount']             = $request-> input('amount');
+            $data['entityvalues']       = $request-> input('entityvalues');
+            $data['remarks']            = $request-> input('remarks');
+            $data['establishment']      = $request-> input('establishment');
 
             $isOrnoExist = $expense
                         -> where('orno','=',$data['orno'])
@@ -126,7 +128,8 @@ class ExpenseController extends Controller
                     $expense->orno              = $data['orno'];
                     $expense->pcv               = $pcv;
                     $expense->ordate            = $data['ordate'];
-                    $expense->category          = $data['category'];
+                    $expense->category          = $data['category_code'];
+                    $expense->category_type     = $data['category_type_code'];
                     $expense->amount            = $data['amount'];
                     $expense->establishment     = $data['establishment'];
                     $expense->remarks           = $data['remarks'];
@@ -175,14 +178,15 @@ class ExpenseController extends Controller
         $message = '';
 
         $validator = Validator::make($request->all(),[
-            'expenseid'     => 'required',
-            'pcv'           => 'required',
-            'amount'        => 'required',
-            'category'      => 'required',
-            'entityvalues'  => 'required',
-            'ordate'        => 'required',
-            'orno'          => 'required',
-            'establishment' => 'required',
+            'expenseid'             => 'required',
+            'pcv'                   => 'required',
+            'amount'                => 'required',
+            'category_code'         => 'required',
+            'category_type_code'    => 'required',
+            'entityvalues'          => 'required',
+            'ordate'                => 'required',
+            'orno'                  => 'required',
+            'establishment'         => 'required',
         ]);
 
         if ($validator-> fails()) {
@@ -197,26 +201,27 @@ class ExpenseController extends Controller
             $expenses_line = new Expense_line;
 
             $data = array();
-            $data['expenseid']      = $request-> input('expenseid');
-            $data['pcv']            = $request-> input('pcv');
-            $data['orno']           = $request-> input('orno');
-            $data['ordate']         = $request-> input('ordate');
-            $data['category']       = $request-> input('category');
-            $data['amount']         = $request-> input('amount');
-            $data['entityvalues']   = $request-> input('entityvalues');
-            $data['remarks']        = $request-> input('remarks');
-            $data['establishment']  = $request-> input('establishment');
+            $data['expenseid']              = $request-> input('expenseid');
+            $data['pcv']                    = $request-> input('pcv');
+            $data['orno']                   = $request-> input('orno');
+            $data['ordate']                 = $request-> input('ordate');
+            $data['category_code']          = $request-> input('category_code');
+            $data['category_type_code']     = $request-> input('category_type_code');
+            $data['amount']                 = $request-> input('amount');
+            $data['entityvalues']           = $request-> input('entityvalues');
+            $data['remarks']                = $request-> input('remarks');
+            $data['establishment']          = $request-> input('establishment');
 
             $isPCVnoExist = $expense
                         -> where('pcv','=',$data['pcv'])
                         -> where('deleted',0)
                         -> first();
 
-            if ($isPCVnoExist) {
+            if (!$isPCVnoExist) {
                 return response()->json([
                     'status'=> 403,
                     'data'=>'',
-                    'message'=>"PCV No. {$data['pcv']} is already exists."
+                    'message'=>"PCV No. {$data['pcv']} doesn't exists."
                 ]);         
             } else {
                 // saving collections
@@ -228,6 +233,7 @@ class ExpenseController extends Controller
                         'orno'              =>$data['orno'],
                         'ordate'            =>$data['ordate'],
                         'category'          =>$data['category_code'],
+                        'category_type'     =>$data['category_type_code'],
                         'amount'            =>$data['amount'],
                         'establishment'     =>$data['establishment'],
                         'remarks'           =>$data['remarks']
@@ -237,7 +243,8 @@ class ExpenseController extends Controller
                     -> where('expenseid',$data['expenseid'])
                     -> update(['active'=>0]);
 
-                if ($data['entityvalues'][0]['entityvalue1']) {
+                // add if has details in expense header
+                if (false) {
                     foreach ($data['entityvalues'] as $key => $entityvalue) {
                         $expense_line = new Expense_line;
 
@@ -256,9 +263,9 @@ class ExpenseController extends Controller
                     return response()->json([
                         'status'=> 200,
                         'data'=>array(
-                            'pcv'=>$pcv
+                            'pcv'=>$data['pcv']
                         ),
-                        'message'=>"PCV No. {$pcv}. Successfully saved."
+                        'message'=>"PCV No. {$data['pcv']}. Successfully updated."
                     ]);         
 
                 });

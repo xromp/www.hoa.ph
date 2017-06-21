@@ -30,6 +30,7 @@ class PersonController extends Controller
     {
 
     	$validator = Validator::make($request->all(), [
+            'action'=>'required',
     		'lname'=>'required|max:100',
     		'fname'=>'required|max:100',
             'type'=>'required'
@@ -49,6 +50,16 @@ class PersonController extends Controller
             'lname'                 =>$request->input('lname'),
             'fname'                 =>$request->input('fname'),
             'mname'                 =>$request->input('mname'),
+
+            'wife_lname'            =>$request->input('wife_lname'),
+            'wife_fname'            =>$request->input('wife_fname'),
+            'wife_mname'            =>$request->input('wife_mname'),
+            'wife_birthday'         =>$request->input('wife_birthday'),
+
+            'wife_contact_mobileno' =>$request->input('wife_contact_mobileno'),
+            'wife_email'            =>$request->input('wife_email'),
+
+            'status'                =>$request->input('status'),
             'type'                  =>$request->input('type'),
             'gender'                =>$request->input('gender'),
             'birthday'              =>$request->input('birthday'),
@@ -114,6 +125,7 @@ class PersonController extends Controller
 
             if ( ($person->id && $formData['action'] == 'CREATE') || ($formData['action'] == 'EDIT') ) {
                 $profileFieldCodes = [
+                    array('fieldcode'=>'STATUS','fieldname'=>'Civil Status','fieldvalue'=>$formData['status']),
                     array('fieldcode'=>'GENDER','fieldname'=>'Gender','fieldvalue'=>$formData['gender']),
                     array('fieldcode'=>'BIRTHDAY','fieldname'=>'Birthday','fieldvalue'=>$formData['birthday']),
                     array('fieldcode'=>'ADDRESS_STREET','fieldname'=>'Address Street','fieldvalue'=>$formData['address_street']),
@@ -126,6 +138,15 @@ class PersonController extends Controller
                     array('fieldcode'=>'REPRESENTATIVE','fieldname'=>'Authorized Representative','fieldvalue'=>$formData['representative']),
                     array('fieldcode'=>'REPRESENTATIVE_RELATIONSHIP','fieldname'=>'Authorized Representative Relationship.','fieldvalue'=>$formData['representative_relationship']),
                     array('fieldcode'=>'REPRESENTATIVE_CONTACTNO','fieldname'=>'Authorized Representative Contact No.','fieldvalue'=>$formData['representative_contactno']),
+
+                    array('fieldcode'=>'WIFE_LNAME','fieldname'=>'Wife lastname','fieldvalue'=>$formData['wife_lname']),
+                    array('fieldcode'=>'WIFE_FNAME','fieldname'=>'Wife firstname','fieldvalue'=>$formData['wife_fname']),
+                    array('fieldcode'=>'WIFE_MNAME','fieldname'=>'Wife middlename','fieldvalue'=>$formData['wife_mname']),
+
+                    array('fieldcode'=>'WIFE_BIRTHDAY','fieldname'=>'Birthday','fieldvalue'=>$formData['wife_birthday']),
+                    array('fieldcode'=>'WIFE_CONTACT_MOBILENO','fieldname'=>'Mobile No.','fieldvalue'=>$formData['wife_contact_mobileno']),
+                    array('fieldcode'=>'WIFE_EMAIL','fieldname'=>'Email','fieldvalue'=>$formData['wife_email']),
+
                 ];
 
                 foreach ($profileFieldCodes as $key => $profile) {
@@ -181,15 +202,23 @@ class PersonController extends Controller
         $totalCollection = 0;
 
         $collection = DB::table('person as p')
-            ->select('t.transactionid','p.personid','c.orno','c.ordate','cc.description as category','cc.description as description','t.amount')
-            ->leftjoin('collection as c', 'c.referenceid', '=', 'p.personid')
+            ->select(
+                't.transactionid',
+                'p.personid',
+                'c.orno',
+                'c.ordate',
+                'cc.description as category',
+                'cc.description as description',
+                't.amount')
+            ->leftjoin('collection as c', 'c.personid', '=', 'p.personid')
             ->leftjoin('collection_category as cc', 'cc.code', '=', 'c.category')
             ->leftjoin('transaction as t', 't.refid', '=', 'c.orno')
             ->where('t.trantype','COLLECTION')
+            ->where('t.posted',1)
             ->where('t.deleted',0);
 
         if ($formData['personid']) {
-            $collection = $collection-> where('personid',$formData['personid']);
+            $collection = $collection-> where('c.personid',$formData['personid']);
         }
         $collection = $collection->get();
 
@@ -205,5 +234,41 @@ class PersonController extends Controller
             ),
             'message'=>''
         ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'personid'=> 'required'
+        ]);
+
+        if ($validator-> fails()) {
+            return response()->json([
+                'status'=> 403,
+                'data'=>'',
+                'message'=>'Unable to save.'
+            ]);
+        }
+
+        $formData = array(
+            'personid'=> $request-> input('personid')
+        );
+        
+        $transaction = DB::transaction(function($formData) use($formData){
+            $updated = DB::table('person')
+                -> where('personid',$formData['personid'])
+                -> update(['deleted'=>1]);
+
+            if (!$updated) {
+                throw new \Exception("Not updated.");
+                
+            }
+            return response() -> json([
+                'status'=>200,
+                'data'=>$formData['personid'],
+                'message'=>"Successfully deleted."
+            ]);
+        });
+        return $transaction;
     }
 }

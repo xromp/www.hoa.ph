@@ -4,6 +4,7 @@ define([
   'use strict';
     app.lazy.controller('ExpenseViewCtrl',ExpenseViewCtrl)
     app.lazy.controller('ModalInfoInstanceCtrl',ModalInfoInstanceCtrl)
+    app.lazy.controller('ExpenseDetailsInstanceCtrl',ExpenseDetailsInstanceCtrl)
     app.lazy.factory('ExpenseViewSrvcs', ExpenseViewSrvcs)
 
       ExpenseViewCtrl.$inject = ['$scope', '$filter', '$window', 'ExpenseViewSrvcs','$uibModal','blockUI', '$http']
@@ -110,7 +111,6 @@ define([
             },function (){
             });
           },function(){alert('Error occured')});
-
         };
 
         vm.datepickerOpen = function(i,y) {
@@ -121,7 +121,74 @@ define([
           }
         };
 
+        vm.showDetails = function (data) {
+          var modalInstance = $uibModal.open({
+            controller:'ExpenseDetailsInstanceCtrl',
+            templateUrl:'expense.view-details',
+            controllerAs: 'vm',
+            backdrop: 'static',
+            resolve :{
+              formData: function () {
+                return {
+                  title: 'Expenss Details',
+                  formData: data,
+                  parent: vm
+                };
+              }
+            }
+          });
+        };
+
         vm.init();
+      }
+
+      ExpenseDetailsInstanceCtrl.$inject = ['$uibModalInstance', '$filter', 'formData','ExpenseViewSrvcs']
+      function ExpenseDetailsInstanceCtrl ($uibModalInstance, $filter, formData, ExpenseViewSrvcs) {
+        var vm = this;
+        vm.formData =formData;
+        vm.init = function(data) {
+          var dataCopy = angular.copy(data);
+
+          var formData = angular.toJson(dataCopy);
+          ExpenseViewSrvcs.get(formData)
+          .then(function(response, status){
+            if (response.data.status == 200) {
+              vm.collectionDetails = response.data.data[0];
+            }
+          });
+        }
+        vm.ok = function() {
+          $uibModalInstance.close();
+        };
+
+        vm.post = function(i) {
+          var formDataCopy = angular.copy(i)
+          vm.response = {};
+          
+          formDataCopy.refid = formDataCopy.pcv;
+          formDataCopy.refdate = $filter('date')(formDataCopy.ordate,'yyyy-MM-dd');
+          formDataCopy.trantype = 'EXPENSE';
+
+          var formData = angular.toJson(formDataCopy);
+          ExpenseViewSrvcs.post(formData)
+          .then(function(response, status){
+            vm.response = response.data;
+            if (response.data.status == 200) {
+              vm.formData.formData.posted =1;
+            }
+          },function(){alert('Error occured')});
+        };
+
+        vm.cancel = function() {
+          $uibModalInstance.dismiss(vm.formData.formData);
+        };
+
+        vm.zeroPad = function(num, places) {
+          var zero = places - num.toString().length + 1;
+          return Array(+(zero > 0 && zero)).join("0") + num;
+        };
+
+        vm.init(vm.formData.formData);
       }
 
       ModalInfoInstanceCtrl.$inject = ['$uibModalInstance', 'formData']

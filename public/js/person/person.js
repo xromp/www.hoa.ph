@@ -5,7 +5,7 @@ define('sims.person',[
 ], function(angular, dependencyResolver){
 	'use strict';
 	 app = angular
-		.module('sims.person',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI', function() {
+		.module('sims.person',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select', function() {
 		}])
 		.config(Config)
 
@@ -50,6 +50,14 @@ define('sims.person',[
 					'/js/person/PersonCreateApp.js'
 				])
 			})
+			.when('/person/view/:personid',{
+				templateUrl:'person.view-details',
+				controller:'PersonViewCtrl',
+				controllerAs:'pv',
+				resolve:dependencyResolver([
+					'/js/person/PersonViewApp.js'
+				])
+			})
 			.when('/dashboard',{
 				templateUrl:'person.dashboard',
 				controller:'PersonCreateCtrl',
@@ -86,23 +94,9 @@ requirejs(['/js/module-loader/requirejs-config.js'], function (){
 	'angular-block-ui',
 	'angular-animate',
 	'angular-sanitize',
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'angular-ui-select',
   ],function($,angular,app){
 	angular.bootstrap(document, [app.name]);
   });
 });
-// requirejs(['/js/module-loader/requirejs-config.js'], function(){
-// 	requirejs([
-// 		'jquery',
-// 		'angular',
-// 		'sims.people',
-
-// 		'angular-route',
-// 		'angular-block-ui',
-// 		'angular-animate',
-// 		'angular-sanitize',
-// 		'ui.bootstrap'
-// 	], function($, angular, app){
-// 		angular.bootstrap(document, [app.name]);
-// 	})
-// })

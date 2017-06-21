@@ -141,10 +141,10 @@ class TransactionController extends Controller
         			-> update(['posted'=>1]);
             } else if ($formData['trantype'] == 'EXPENSE') {
                 DB::table('expense')
-                    -> where('orno',$formData['refid'])
+                    -> where('pcv',$formData['refid'])
                     -> update(['posted'=>1]);
             } else {
-                throw new \Exception('Transaction posting failed.');   
+                throw new \Exception('Transaction posting failed.');
             }
 
     		$transaction->trantype		= $formData['trantype'];

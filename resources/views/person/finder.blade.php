@@ -22,24 +22,31 @@
         <h2>Member's Inquiry
           <small>This <strong>Member's Inquiry</strong> responsible for viewing of member's profile including unpaid contributions/dues.</small>
         </h2>
-        <ul class="nav navbar-right panel_toolbox">
-          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Settings 1</a>
-              </li>
-              <li><a href="#">Settings 2</a>
-              </li>
-            </ul>
-          </li>
-          <li><a class="close-link"><i class="fa fa-close"></i></a>
-          </li>
-        </ul>
         <div class="clearfix"></div>
       </div>
       <div class="x_content">
+
+        <div class="alert alert-success">
+          <div class="row">
+            <div class="col-md-5">
+              Members
+              <div class="form-group">
+                <ui-select name="personid" ng-model="pf.query.personid" theme="bootstrap" required>
+                  <ui-select-match placeholder="Search homeowner members..."><% $select.selected.name%></ui-select-match>
+                  <ui-select-choices repeat="person.personid as person in pf.personList | filter: $select.search">
+                    <div ng-bind-html="person.name | highlight: $select.search"></div>
+                    <small ng-bind-html="person.address | highlight: $select.search"></small>
+                  </ui-select-choices>
+                </ui-select>
+              </div>
+            </div>
+
+            <div class="pull-right">
+              <button class="btn btn-default" ng-click="pf.get(pf.query)"><i class="glyphicon glyphicon-search"></i></button>
+            </div>
+          </div>
+        </div>
+
         <div class="pull-right">
           <a class="btn btn-success" href="/person/create"><i class="glyphicon glyphicon-plus"></i> Add Member</a>
         </div>
@@ -67,9 +74,8 @@
               </td>
               <td class="">
                 <div class="pull-right">
-                  <button class="btn btn-info btn-xs" ng-click="pf.edit(collection)"><i class="glyphicon glyphicon-pencil"></i></button>
-                  <!-- <button class="btn btn-success" ng-click="pf.post(collection)">Activate</button> -->
-                  <button class="btn btn-danger btn-xs" ng-click="pf.remove(collection)"><i class="glyphicon glyphicon-remove"></i></button>
+                  <button class="btn btn-info btn-xs" ng-click="pf.edit(person)"><i class="glyphicon glyphicon-pencil"></i></button>
+                  <button class="btn btn-danger btn-xs" ng-click="pf.remove()"><i class="glyphicon glyphicon-remove"></i></button>
                 </div>
               </td>
               <!-- <td ng-bind="person.type"></td> -->

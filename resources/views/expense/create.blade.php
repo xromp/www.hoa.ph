@@ -16,7 +16,7 @@
       </div>
 
       <div class="form-group" ng-class="{'has-error': ecc.frmCreate.ordate.$invalid && ecc.frmCreate.withError }">
-        <label class="control-label col-md-3 col-sm-3 col-xs-12">OR Date <span class="required">*</span></label>
+        <label class="control-label col-md-3 col-sm-3 col-xs-12">Ref Date <span class="required">*</span></label>
         <div class="col-md-9 col-sm-9 col-xs-12">
         <p class="input-group">
           <input type="text" class="form-control" name="ordate" uib-datepicker-popup="MM/dd/yyyy" ng-model="ecc.collectionDetails.ordate" is-open="ecc.dtIsOpen" datepicker-options="dateOptions" close-text="Close" alt-input-formats="altInputFormats" required/>
@@ -57,7 +57,7 @@
         <label class="control-label col-md-3 col-sm-3 col-xs-12">Category <span class="required">*</span>
         </label>
         <div class="col-md-9 col-sm-9 col-xs-12">
-          <ui-select class="col-md-10" name="category" ng-model="ecc.collectionDetails.category" theme="bootstrap" ng-init="ecc.getCategoryTypeList(ecc.collectionDetails)" ng-change="ecc.getCategoryTypeList(ecc.collectionDetails)" required>
+          <ui-select class="col-md-10" name="category" ng-model="ecc.collectionDetails.category_code" theme="bootstrap" ng-init="ecc.getCategoryTypeList(ecc.collectionDetails,'INIT')" ng-change="ecc.getCategoryTypeList(ecc.collectionDetails,'CHANGE')" required>
             <ui-select-match placeholder="Select from category list..."><% $select.selected.description%></ui-select-match>
             <ui-select-choices repeat="category.code as category in ecc.categoryList | filter: $select.search">
               <div ng-bind-html="category.description | highlight: $select.search"></div>
@@ -78,7 +78,7 @@
               <div ng-bind-html="categorytype.description | highlight: $select.search"></div>
             </ui-select-choices>
           </ui-select>
-          <button class="btn btn-success" ng-click="ecc.addCategoryType(ecc.collectionDetails)"><i class="glyphicon glyphicon-plus"></i></button>
+          <button class="btn btn-success" ng-click="ecc.addCategoryType(ecc.collectionDetails)" ng-disabled="!ecc.collectionDetails.category_code"><i class="glyphicon glyphicon-plus"></i></button>
           <span class="help-block" ng-show="ecc.frmCreate.categorytype.$invalid && ecc.frmCreate.withError">Type is required field.</span>
         </div>
       </div>

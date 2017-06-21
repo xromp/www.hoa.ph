@@ -25,10 +25,12 @@ Route::get('/dashboard','DashboardController@index');
 // person
 Route::get('/person/create','PersonController@index');
 Route::get('/person/edit/{id}','PersonController@index');
+Route::get('/person/view/{id}','PersonController@index');
 Route::get('/person/finder','PersonController@index');
 
 Route::post('/api/person/create','PersonController@store');
 Route::get('/api/person/get','PersonController@getPersonProfile');
+Route::post('/api/person/delete','PersonController@delete');
 Route::get('/api/person/collection/get','PersonController@getPersonCollection');
 
 

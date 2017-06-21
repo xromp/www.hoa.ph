@@ -48,6 +48,7 @@ class ExpenseCategoryController extends Controller
 
     	$isCodeExist = DB::table('expense_category')
     		-> where('code',$formData['code'])
+            -> where('active',1)
     		->first();
 
     	if ($isCodeExist) {

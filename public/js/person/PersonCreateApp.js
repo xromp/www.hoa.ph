@@ -9,11 +9,17 @@ define([
       PersonCreateCtrl.$inject = ['$scope', '$filter', '$window', '$routeParams', 'PersonSrvcs','$uibModal','blockUI', '$http']
       function PersonCreateCtrl($scope, $filter, $window, $routeParams, PersonSrvcs, $uibModal, blockUI, $http){
         var vm = this;
-        vm.personInfo = {};
-        vm.personInfo.action = 'CREATE';
-        vm.personInfo.type = 'HOMEOWNER';
 
-        if ($routeParams.id) {
+        vm.default = function(){
+          vm.personInfo = {};
+          vm.personInfo.action = 'CREATE';
+          vm.personInfo.type = 'HOMEOWNER';
+          vm.personInfo.status = 'MARRIED';
+        }
+
+        vm.default();
+
+        if ($routeParams.personid) {
           vm.editInfo = {};
           vm.personInfo.personid = $routeParams.personid;
 
@@ -33,7 +39,8 @@ define([
             var dataCopy = angular.copy(data);
             dataCopy.action = vm.personInfo.action;
             dataCopy.birthday = $filter('date')(dataCopy.birthday,'yyyy-MM-dd');
-            
+            dataCopy.wife_birthday = $filter('date')(dataCopy.wife_birthday,'yyyy-MM-dd');
+
             var formData = angular.toJson(dataCopy);
             var appBlockUI = blockUI.instances.get('blockUI');
             appBlockUI.start();
@@ -79,19 +86,25 @@ define([
             if (response.data.status == 200) {
               vm.personInfo = response.data.data[0];
               vm.personInfo.birthday = new Date(vm.personInfo.birthday);
+              vm.personInfo.wife_birthday = new Date(vm.personInfo.wife_birthday);
+              vm.personInfo.action = dataCopy.action;
             }
           },function(){ alert("Bad Request!")})
         };
 
         vm.reset = function () {
-          vm.personInfo = {};
+          vm.default();
         };
 
         vm.cancel = function () {
           $window.location.href = '/person/finder';
         };
-        vm.datepickerOpen = function(i) {
-          i.dtIsOpen = true;
+        vm.datepickerOpen = function(i,y) {
+          if (y == 1) {
+            i.dtIsOpen1 = true;
+          } else if (y == 2) {
+            i.dtIsOpen2 = true;
+          };;
         };
 
         vm.init(vm.personInfo);

@@ -12,6 +12,9 @@
 <script type="text/ng-template" id="person.dashboard">
 	@include('person.dashboard')
 </script>
+<script type="text/ng-template" id="person.view-details">
+  @include('person.view-details')
+</script>
 @endsection
 
 @section('scripts')

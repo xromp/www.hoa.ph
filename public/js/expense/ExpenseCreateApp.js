@@ -15,7 +15,6 @@ define([
         vm.default = function(){
           vm.collectionDetails = {
             amount:'',
-            category:'',
             action:'CREATE'
           };
         };
@@ -32,7 +31,7 @@ define([
           if (vm.collectionDetails.action == 'UPDATE') {
             var data = {
               'posted':0,
-              'action':'EDIT',
+              'action':'UPDATE',
               'expenseid':vm.collectionDetails.expenseid
             };
 
@@ -152,6 +151,9 @@ define([
               vm.collectionDetails = response.data.data[0];
               vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
               vm.collectionDetails.amount = parseFloat(vm.collectionDetails.amount);
+              vm.collectionDetails.action = dataCopy.action;
+
+              vm.getCategoryTypeList(vm.collectionDetails);
             }
           },function(){ alert("Bad Request!")})
         };
@@ -177,9 +179,14 @@ define([
           });
         };
 
-        vm.getCategoryTypeList = function(data){
+        vm.getCategoryTypeList = function(data,i){
           var formDataCopy = angular.copy(data);
-          formDataCopy.category_code = formDataCopy.category;
+
+          if (i == 'CHANGE') {
+            data.category_type_code = '';
+          }
+
+          formDataCopy.category_code = formDataCopy.category_code;
 
           var formData = angular.toJson(formDataCopy);
           ExpenseCreateSrvcs.getcategorytype(formData)
@@ -189,7 +196,7 @@ define([
             }
           }, function(){
             alert('Error!')
-          });          
+          });
         }
 
         vm.datepickerOpen = function(i) {
@@ -248,24 +255,22 @@ define([
       function CategoryModalCrtl ($compile, $uibModalInstance, formData, ExpenseCreateSrvcs) {
         var vm = this;
         vm.formData = formData;
-        console.log(vm.formData);
-        // vm.ok = function() {
-        //   $uibModalInstance.close();
-        // };
+
         vm.submit= function(i){
           if (vm.frmCreate.$valid) {
             vm.frmCreate.withError = false;
             vm.response = [];
 
             var formDataCopy = angular.copy(i);
+            i.code = i.code.toUpperCase();
 
             var formData = angular.toJson(formDataCopy);
             ExpenseCreateSrvcs.savecategory(formData)
             .then(function(response, status){
+              vm.response=response.data;
               if (response.data.status == 200) {
-                vm.categoryDetails = {};s
+                vm.categoryDetails = {};
               }
-              vm.response.push(response.data);
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;
@@ -281,24 +286,23 @@ define([
       function CategoryTypeModalCrtl ($compile, $uibModalInstance, formData, ExpenseCreateSrvcs) {
         var vm = this;
         vm.formData = formData;
-        // vm.ok = function() {
-        //   $uibModalInstance.close();
-        // };
+
         vm.submit= function(i){
           if (vm.frmCreate.$valid) {
             vm.frmCreate.withError = false;
             vm.response = [];
 
             var formDataCopy = angular.copy(i);
-            formDataCopy.category_code = vm.formData.formData.category;
+            formDataCopy.category_code = vm.formData.formData.category_code;
+            formDataCopy.code = formDataCopy.code.toUpperCase();
 
             var formData = angular.toJson(formDataCopy);
             ExpenseCreateSrvcs.savecategorytype(formData)
             .then(function(response, status){
+              vm.response = response.data;
               if (response.data.status == 200) {
                 vm.categoryDetails = {};
               }
-              vm.response.push(response.data);
             }, function(){alert('Error occured')});
           } else {
             vm.frmCreate.withError = true;

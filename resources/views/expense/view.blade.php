@@ -70,19 +70,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-class="{'bg-success':expense.posted,'bg-danger':expense.deleted}" ng-repeat="expense in ev.expenseDetails | orderBy:'pcv'">
+        <tr ng-class="{'bg-success':expense.posted,'bg-danger':expense.deleted}" ng-repeat="expense in ev.expenseDetails | orderBy:'pcv'" ng-click="ev.showDetails(expense)">
           <td ><% $index+1 %></td>
           <td class="text-right" ng-bind="expense.pcv"></td>
           <td class="text-left" ng-bind="expense.orno"></td>
           <td ng-bind="expense.ordate | date:'dd-MMM-yyyy'"></td>
-          <td ng-bind="expense.category"></td>
-          <td class="text-right" ng-bind="expense.amount"></td>
+          <td ng-bind="expense.category_description"></td>
+          <td class="text-right" ng-bind="expense.amount | number:2" style="padding-right:5%"></td>
           <td ng-bind="expense.created_at | date:'dd-MMM-yyyy'"></td>
           <td class="">
             <div class="pull-right">
-              <button class="btn btn-success btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.post(expense)"><i class="glyphicon glyphicon-ok"></i></button>
-              <button class="btn btn-info btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.edit(expense)"><i class="glyphicon glyphicon-pencil"></i></button>
-              <button class="btn btn-danger btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.remove(expense)"><i class="glyphicon glyphicon-remove"></i></button>
+              <button class="btn btn-success btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.post(expense);$event.stopPropagation();"><i class="glyphicon glyphicon-ok"></i></button>
+              <button class="btn btn-info btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.edit(expense);$event.stopPropagation();"><i class="glyphicon glyphicon-pencil"></i></button>
+              <button class="btn btn-danger btn-xs" ng-disabled="expense.posted || expense.deleted" ng-click="ev.remove(expense);$event.stopPropagation();"><i class="glyphicon glyphicon-remove"></i></button>
             </div>
           </td>
         </tr>

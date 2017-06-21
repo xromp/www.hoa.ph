@@ -16,8 +16,9 @@
 <script type="text/ng-template" id="expense.view">
 	@include('expense.view')
 </script>
-
-
+<script type="text/ng-template" id="expense.view-details">
+  @include('expense.view-details')
+</script>
 <script type="text/ng-template" id="expense.reports.base">
 	@include('expense.reports.base')
 </script>
