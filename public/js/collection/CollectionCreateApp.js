@@ -52,7 +52,7 @@ define([
 
           // CAR STICKER
           vm.stickerDetails = [
-            {'stickerid':'', 'plateno':''}
+            {'stickerid':'', 'plateno':'', 'year': (new Date().getFullYear())}
           ]
 
           // load collection details if edit.
@@ -93,7 +93,7 @@ define([
                   dataCopy.entityvalues.push({
                     'entityvalue1':v.stickerid,
                     'entityvalue2':v.plateno,
-                    'entityvalue3':''
+                    'entityvalue3':v.year
                   });
                 }
               });
@@ -170,7 +170,7 @@ define([
               } else if (vm.collectionDetails.category_code == 'CARSTICKER') {
                 vm.stickerDetails = [];
                 angular.forEach(vm.collectionDetails.entityvalues, function(v, k){
-                  vm.stickerDetails.push({stickerid:v.entityvalue1, plateno:v.entityvalue2});
+                  vm.stickerDetails.push({stickerid:v.entityvalue1, plateno:v.entityvalue2, year:v.entityvalue3});
                 });
               }
             }
@@ -264,7 +264,7 @@ define([
         };
 
         vm.addCarSticker = function() {
-          vm.stickerDetails.push({'stickerid':'', 'plateno':''});
+          vm.stickerDetails.push({'stickerid':'', 'plateno':'', 'year':(new Date().getFullYear())});
         };
         
         vm.removeCarSticker = function(i) {

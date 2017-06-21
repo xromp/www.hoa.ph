@@ -207,8 +207,10 @@ class PersonController extends Controller
                 'p.personid',
                 'c.orno',
                 'c.ordate',
-                'cc.description as category',
+                'c.category',
                 'cc.description as description',
+                'c.collectionid',
+                'c.remarks',
                 't.amount')
             ->leftjoin('collection as c', 'c.personid', '=', 'p.personid')
             ->leftjoin('collection_category as cc', 'cc.code', '=', 'c.category')
@@ -221,19 +223,125 @@ class PersonController extends Controller
             $collection = $collection-> where('c.personid',$formData['personid']);
         }
         $collection = $collection->get();
+        $result = json_decode($collection, true);
 
-        foreach ($collection as $key => $col) {
-            $totalCollection += $col->amount;
+        foreach ($result as $key => $col) {
+            $totalCollection += $col['amount'];
+            $collection_line = new Collection_line;
+
+            $collection_line = DB::table('collection_line')
+                ->select('entityvalue1','entityvalue2','entityvalue3')
+                ->where('collectionid',$col['collectionid'])
+                ->where('active',1)
+                ->get();
+
+            $collection_line = json_decode($collection_line, true);
+            $entityvalues =  array();
+            foreach ($collection_line as $key1 => $col_line) {
+                $i = $col_line['entityvalue1']."-".$col_line['entityvalue2'];
+                array_push($entityvalues, $i);
+            }
+            $result[$key]['entityvalues_desc'] = implode(",", $entityvalues);
+            $result[$key]['entityvalues'] = $collection_line;
         }
 
         return response()->json([
             'status'=> 200,
             'data'=>array(
-                'collection'=> $collection,
+                'collection'=> $result,
                 'total'=>$totalCollection
             ),
             'message'=>''
         ]);
+    }
+
+    public function getMonthlyDues(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'personid'=>'required'
+        ]);
+
+        if ($validator-> fails()) {
+            return response()->json([
+                'status'=> 403,
+                'data'=>'',
+                'message'=>'Unable to save.'
+            ]);
+        }
+
+        $formData = array(
+            'personid'=> $request->input('personid')
+        );
+
+        $transaction = DB::transaction(function($formData) use ($formData) {
+            $collection = DB::table('collection as c')
+                -> select(
+                    'cl.entityvalue1 as month',
+                    'cl.entityvalue2 as year',
+                    DB::raw('CONCAT(cl.entityvalue1,"-",cl.entityvalue2) as code')
+                    )
+                ->leftjoin('collection_line as cl','c.collectionid','=','cl.collectionid')
+                ->leftjoin('transaction as t','t.refid','=','c.orno')
+                ->where('personid',$formData['personid'])
+                ->where('c.category','MONTHLYDUES')
+                ->where('t.posted',1)
+                ->where('active',1)
+                ->get();
+            return response() ->json([
+                'status'=> 200,
+                'data'=> array(
+                    'monthlydueslist'=>$collection
+                ),
+                'message'=>''
+            ]);
+        });
+
+        return $transaction;
+    }
+
+    public function getCarSticker(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'personid'=>'required'
+        ]);
+
+        if ($validator-> fails()) {
+            return response()->json([
+                'status'=> 403,
+                'data'=>'',
+                'message'=>'Unable to save.'
+            ]);
+        }
+
+        $formData = array(
+            'personid'=> $request->input('personid')
+        );
+
+        $transaction = DB::transaction(function($formData) use ($formData) {
+            $collection = DB::table('collection as c')
+                -> select(
+                    'cl.entityvalue1 as stickerid',
+                    'cl.entityvalue2 as plateno',
+                    'cl.entityvalue3 as year',
+                    DB::raw('CONCAT(cl.entityvalue1,"-",cl.entityvalue3) as code')
+                    )
+                ->leftjoin('collection_line as cl','c.collectionid','=','cl.collectionid')
+                ->leftjoin('transaction as t','t.refid','=','c.orno')
+                ->where('personid',$formData['personid'])
+                ->where('c.category','CARSTICKER')
+                ->where('t.posted',1)
+                ->where('active',1)
+                ->get();
+            return response() ->json([
+                'status'=> 200,
+                'data'=> array(
+                    'carstickerlist'=>$collection
+                ),
+                'message'=>''
+            ]);
+        });
+
+        return $transaction;
     }
 
     public function delete(Request $request)

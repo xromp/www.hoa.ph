@@ -134,9 +134,9 @@
 
                     <!--CAR Sticker  -->
                     <div ng-if="cc.collectionDetails.category_code == 'CARSTICKER'">
-                      <div class="form-group" ng-class="{'has-error': (cc.frmCreate.stickerid.$invalid || cc.frmCreate.plateno.$invalid) && cc.frmCreate.withError }">
+                      <div class="form-group" ng-class="{'has-error': (cc.frmCreate.stickerid.$invalid || cc.frmCreate.plateno.$invalid || cc.frmCreate.year.$invalid) && cc.frmCreate.withError }">
                         <div class="form-group" ng-repeat="sticker in cc.stickerDetails">
-                          <div class="col-md-4 col-md-offset-3">
+                          <div class="col-md-4">
                             <input type="text" name="stickerid" class="form-control" ng-model="sticker.stickerid" placeholder="Sticker ID" required>
                             <small class="help-block" ng-show="cc.frmCreate.stickerid.$invalid && cc.frmCreate.withError">Sticker ID is required field.</small>
                           </div>
@@ -144,6 +144,11 @@
                             <input type="text" name="plateno" class="form-control" ng-model="sticker.plateno" placeholder="Plate No." required>
                             <small class="help-block" ng-show="cc.frmCreate.plateno.$invalid && cc.frmCreate.withError">Plate No. is required field.</small>
                           </div>
+                          <div class="col-md-3">
+                            <input type="text" name="year" class="form-control" ng-model="sticker.year" placeholder="Year" required>
+                            <small class="help-block" ng-show="cc.frmCreate.year.$invalid && cc.frmCreate.withError">Year is required field.</small>
+                          </div>
+
                           <div class="pull-right" ng-if="!$first">
                             <button class="btn btn-danger btn-xs" ng-click="cc.removeCarSticker($index)">X</button>
                           </div>

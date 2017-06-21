@@ -43,7 +43,7 @@ class TransactionController extends Controller
     			DB::raw('COALESCE(ec.code,"") as category'), 
     			DB::raw('max(COALESCE(ec.description,"NO DEFINED CATEGORY")) as description'),
     			DB::raw('SUM(t.amount) as amount'))
-    		-> leftjoin('expense  as e','e.orno','=','t.refid')
+    		-> leftjoin('expense  as e','e.pcv','=','t.refid')
     		-> leftjoin('expense_category  as ec','ec.code','=','e.category')
     		-> where('t.deleted',false)
     		-> Where('trantype','EXPENSE')

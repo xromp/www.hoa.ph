@@ -32,6 +32,8 @@ Route::post('/api/person/create','PersonController@store');
 Route::get('/api/person/get','PersonController@getPersonProfile');
 Route::post('/api/person/delete','PersonController@delete');
 Route::get('/api/person/collection/get','PersonController@getPersonCollection');
+Route::get('/api/person/collection/getmonthlydues','PersonController@getMonthlyDues');
+Route::get('/api/person/collection/getcarsticker','PersonController@getCarSticker');
 
 
 

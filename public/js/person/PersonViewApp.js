@@ -18,6 +18,23 @@ define([
         vm.init = function (){
           vm.getByPerson(vm.personInfo);
           vm.getcollection(vm.personInfo);
+          vm.getMonthlyDues(vm.personInfo);
+          vm.getCarSticker(vm.personInfo);
+
+          vm.month = [
+            {'id':1,'code':'JAN','description':'January'},
+            {'id':2,'code':'FEB','description':'February'},
+            {'id':2,'code':'MAR','description':'March'},
+            {'id':2,'code':'APR','description':'April'},
+            {'id':2,'code':'MAY','description':'May'},
+            {'id':2,'code':'JUN','description':'June'},
+            {'id':2,'code':'JUL','description':'July'},
+            {'id':2,'code':'AUG','description':'August'},
+            {'id':2,'code':'SEP','description':'September'},
+            {'id':2,'code':'OCT','description':'October'},
+            {'id':2,'code':'NOV','description':'November'},
+            {'id':2,'code':'DEC','description':'December'}
+          ];
         }
         vm.getByPerson = function (data) {
           var dataCopy = angular.copy(data)
@@ -62,6 +79,50 @@ define([
           return Array(+(zero > 0 && zero)).join("0") + num;
         };
         
+        vm.getMonthlyDues = function(i){
+          var data = angular.copy(i);
+          vm.year = [(new Date().getFullYear())];
+          vm.monthlydueslist = [];
+
+          PersonViewSrvcs.getmonthlydues(data)
+          .then(function (response,status){
+            if (response.data.status == 200) {
+              vm.paidmonthlydues = response.data.data.monthlydueslist;
+
+              angular.forEach(vm.year, function(v, k){
+                angular.forEach(vm.month, function(v1, k1){
+                  vm.monthlydueslist.push({
+                    'description':v1.code + '-'+ v,
+                    'code':v1.code + '-'+ v,
+                    'paid':0,
+                  });
+                });
+              });
+
+              angular.forEach(vm.monthlydueslist, function(v, k){
+                angular.forEach(vm.paidmonthlydues, function(v1, k1){
+                  if (v.code == v1.code) {
+                    v.paid =1;
+                  }
+                })
+              });
+            }
+          }, function(){alert('Error Occured!')});
+        };
+
+        vm.getCarSticker = function(i){
+          var data = angular.copy(i);
+          vm.year = [(new Date().getFullYear())];
+          vm.monthlydueslist = [];
+
+          PersonViewSrvcs.getcarsticker(data)
+          .then(function (response,status){
+            if (response.data.status == 200) {
+              vm.carstickerlist = response.data.data.carstickerlist;
+            }
+          }, function(){alert('Error Occured!')});
+        };
+
         vm.init();
       }
 
@@ -101,6 +162,22 @@ define([
             return $http({
               method:'GET',
               url:'api/person/collection/get?personid='+data.personid,
+              data:data,
+              headers:{'Content-Type':'application/json'}
+            });
+          },
+          getmonthlydues:function(data){
+            return $http({
+              method:'GET',
+              url:'/api/person/collection/getmonthlydues?personid='+data.personid,
+              data:data,
+              headers:{'Content-Type':'application/json'}
+            });
+          },
+          getcarsticker:function(data){
+            return $http({
+              method:'GET',
+              url:'/api/person/collection/getcarsticker?personid='+data.personid,
               data:data,
               headers:{'Content-Type':'application/json'}
             });
