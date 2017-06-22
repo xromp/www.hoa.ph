@@ -123,6 +123,11 @@ define([
           }, function(){alert('Error Occured!')});
         };
 
+        vm.back = function () {
+          $window.location.href = '/person/finder/';
+        };
+
+
         vm.init();
       }
 

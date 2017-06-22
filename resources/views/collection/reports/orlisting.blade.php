@@ -11,8 +11,6 @@
  <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>#</th>
-			<th>OR No.</th>
 			<th>OR No.</th>
 			<th>OR Date</th>
 			<th>Category</th>
@@ -20,14 +18,12 @@
 		</tr>
 	</thead>
 	<tbody>
-	 	@foreach ($data['orlist'] as $key=> $or)
+	 	@foreach ($data['orlist']->sortBy('orno')  as $key=> $or)
 		<tr>
-			<td class="text-muted">{{++$key}}</td>
-			<td>{{$or->orno}}</td>
-			<td>{{$or->orno}}</td>
-			<td>{{$or->ordate}}</td>
+			<td>{{ $or->orno }}</td>
+			<td>{{ date("m/d/Y",strtotime($or->ordate)) }}</td>
 			<td>{{$or->category}}</td>
-			<td class="text-center">{{$or->amount_paid}}</td>
+			<td class="text-center">{{ number_format($or->amount,2) }}</td>
 		</tr>
 		@endforeach
 		<tr>

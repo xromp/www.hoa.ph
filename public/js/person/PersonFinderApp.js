@@ -74,11 +74,12 @@ define(['angular'], function() {
       }
 
     	vm.showPersonDetail = function (person) {
-	      if (person.isshowdetails) {
-	        person.isshowdetails = false;
-	      } else {
-	        // person.isshowdetails = true;
-	      }
+        $window.location.href = '/person/view/'+person.personid;
+	      // if (person.isshowdetails) {
+	      //   person.isshowdetails = false;
+	      // } else {
+	      //   // person.isshowdetails = true;
+	      // }
 	    };
 	    // --- Load Init --
 	    vm.init();

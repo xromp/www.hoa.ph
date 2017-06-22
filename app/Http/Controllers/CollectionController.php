@@ -294,7 +294,7 @@ class CollectionController extends Controller
 
         $orlist = DB::table('collection')
             -> leftjoin('collection_category','collection_category.code','=','collection.category')
-            ->select ('orno','ordate','collection_category.description as category','amount','collection.created_at');
+            ->select ('orno','ordate','collection_category.description as category','collection.amount','collection.created_at');
 
         if ($formData['startdate'] && $formData['enddate']) {
             $orlist = $orlist
@@ -312,6 +312,31 @@ class CollectionController extends Controller
         return view('collection.reports.orlisting', array('data'=>$data));
     }
 
+    public function reports_orcategorysummary(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'datestart'=> 'required',
+            'dateend'=> 'required',
+        ]);
+
+        if ($validator->fails()) {
+            throw new \Exception("Error Processing Request", 1);
+        }
+        $formData = array(
+            'datestart'=> $request->input('datestart'),
+            'dateend'=> $request->input('dateend'),
+        );
+
+        $category = DB::select('CALL sp_categorysummary(?,?)',array($formData['datestart'],$formData['dateend']));
+
+        $data = array(
+            'categorylist'=>$category,
+            'formData'=>$formData
+        );
+        dd($category);
+        return view('collection.reports.category-summary', array('data'=>$data));
+
+    }
     public function delete(Request $request)
     {
         $formData = array(

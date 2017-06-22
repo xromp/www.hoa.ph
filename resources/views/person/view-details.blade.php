@@ -3,7 +3,11 @@
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
       <div class="x_content">
-
+        <div class="row">
+          <div class="pull-right">
+            <button class="btn btn-danger" ng-click="pv.back()"><i class="fa fa-arrow-left"></i> Back to Finder</button>
+          </div>
+        </div>
         <div class="row" style="margin-bottom:25px;">
           <div class="clearfix"></div>
           <div class="col-md-5 col-sm-4 col-xs-6">

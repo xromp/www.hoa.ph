@@ -48,6 +48,7 @@ Route::get('/collection/edit/{id}','CollectionController@index');
 Route::get('/collection/create','CollectionController@index');
 Route::get('/collection/reports','CollectionController@index');
 Route::get('/collection/reports/orlisting','CollectionController@reports_orlisting');
+Route::get('/collection/reports/category_summary','CollectionController@reports_orcategorysummary');
 Route::post('/api/collection/get','CollectionController@get');
 Route::post('/api/collection/create','CollectionController@create');
 Route::post('/api/collection/update','CollectionController@update');
