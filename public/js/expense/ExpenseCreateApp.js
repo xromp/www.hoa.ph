@@ -45,12 +45,11 @@ define([
             
             var dataCopy = angular.copy(data);
             dataCopy.ordate = $filter('date')(dataCopy.ordate,'yyyy-MM-dd');
-            dataCopy.entityvalues = [];
-            dataCopy.entityvalues.push({
-              'entityvalue1':dataCopy.categoryType,
+            dataCopy.entityvalues = [{
+              'entityvalue1':'',
               'entityvalue2':'',
               'entityvalue3':''
-            });
+            }];
 
             var appBlockUI = blockUI.instances.get('blockUI');
             appBlockUI.start();

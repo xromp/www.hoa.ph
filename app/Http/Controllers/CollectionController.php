@@ -293,8 +293,13 @@ class CollectionController extends Controller
         // dd($formData);
 
         $orlist = DB::table('collection')
+            ->select (
+                'orno',
+                'ordate',
+                'collection_category.description as category',
+                'collection.amount','collection.created_at')
             -> leftjoin('collection_category','collection_category.code','=','collection.category')
-            ->select ('orno','ordate','collection_category.description as category','collection.amount','collection.created_at');
+            -> where('collection.posted',1);
 
         if ($formData['startdate'] && $formData['enddate']) {
             $orlist = $orlist
@@ -333,8 +338,13 @@ class CollectionController extends Controller
             'categorylist'=>$category,
             'formData'=>$formData
         );
-        dd($category);
-        return view('collection.reports.category-summary', array('data'=>$data));
+
+        return response() -> json([
+            'status'=>200,
+            'data'=>array(
+                'categorysummarylist'=>$category),
+            'message'=>''
+        ]);
 
     }
     public function delete(Request $request)

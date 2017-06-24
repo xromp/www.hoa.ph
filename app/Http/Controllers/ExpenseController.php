@@ -68,6 +68,7 @@ class ExpenseController extends Controller
         $message = '';
 
         $validator = Validator::make($request->all(),[
+            'pcv'                => 'required',
             'amount'                => 'required',
             'category_code'         => 'required',
             'category_type_code'    => 'required',
@@ -89,6 +90,7 @@ class ExpenseController extends Controller
             $expenses_line = new Expense_line;
 
             $data = array();
+            $data['pcv']               = $request-> input('pcv');
             $data['orno']               = $request-> input('orno');
             $data['ordate']             = $request-> input('ordate');
             $data['category_code']      = $request-> input('category_code');
@@ -99,7 +101,7 @@ class ExpenseController extends Controller
             $data['establishment']      = $request-> input('establishment');
 
             $isOrnoExist = $expense
-                        -> where('orno','=',$data['orno'])
+                        -> where('pcv','=',$data['pcv'])
                         -> where('deleted',0)
                         -> first();
 
@@ -107,26 +109,16 @@ class ExpenseController extends Controller
                 return response()->json([
                     'status'=> 403,
                     'data'=>'',
-                    'message'=>"OR no. {$data['orno']} is already exists."
+                    'message'=>"PCV no. {$data['pcv']} is already exists."
                 ]);         
             } else {
                 // saving collections
                 $transaction = DB::transaction(function($data) use($data){
                     // dd($data['orno']);
                     $expense = new Expense;
-                    $pcv = 0;
-                    $counter=0;
-
-                    $pcvTemp = DB::table('expense')
-                        ->orderBy('expenseid','desc')
-                        ->first();
-                    if ($pcvTemp) {
-                        $counter = $pcvTemp->pcv;
-                    }
-                    $pcv = $counter +1;
                     
                     $expense->orno              = $data['orno'];
-                    $expense->pcv               = $pcv;
+                    $expense->pcv               = $data['pcv'];;
                     $expense->ordate            = $data['ordate'];
                     $expense->category          = $data['category_code'];
                     $expense->category_type     = $data['category_type_code'];
@@ -161,9 +153,9 @@ class ExpenseController extends Controller
                     return response()->json([
                         'status'=> 200,
                         'data'=>array(
-                            'pcv'=>$pcv
+                            'pcv'=>0
                         ),
-                        'message'=>"PCV No. {$pcv}. Successfully saved."
+                        'message'=>"Successfully saved."
                     ]);         
 
                 });

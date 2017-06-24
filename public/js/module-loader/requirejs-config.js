@@ -34,8 +34,11 @@ requirejs.config({
     'datepicker': '/assets/js/datepicker/daterangepicker',
 
     // customs
-    'custom' :'/assets/custom/js/custom.min'
+    'custom' :'/assets/custom/js/custom.min',
 
+
+    'alasql' :'/assets/alasql/alasql.min',
+    'xlsx.core' :'/assets/alasql/xlsx.core.min',
   },
   shim:{
 

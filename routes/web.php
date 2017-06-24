@@ -15,9 +15,6 @@ Route::get('/', function () {
     return view('layouts.master');
 });
 
-// login
-Route::get('/login','LoginController@index');
-Route::post('/api/login','LoginController@login');
 
 // dashboard
 Route::get('/dashboard','DashboardController@index');
@@ -35,12 +32,9 @@ Route::get('/api/person/collection/get','PersonController@getPersonCollection');
 Route::get('/api/person/collection/getmonthlydues','PersonController@getMonthlyDues');
 Route::get('/api/person/collection/getcarsticker','PersonController@getCarSticker');
 
-
-
 // collection_category
 Route::get('/api/collection/category/get','CollectionCategoryController@get');
 Route::post('/api/collection/category/create','CollectionCategoryController@create');
-
 
 // collection reports
 Route::get('/collection/view','CollectionController@index');
@@ -48,20 +42,20 @@ Route::get('/collection/edit/{id}','CollectionController@index');
 Route::get('/collection/create','CollectionController@index');
 Route::get('/collection/reports','CollectionController@index');
 Route::get('/collection/reports/orlisting','CollectionController@reports_orlisting');
-Route::get('/collection/reports/category_summary','CollectionController@reports_orcategorysummary');
 Route::post('/api/collection/get','CollectionController@get');
 Route::post('/api/collection/create','CollectionController@create');
 Route::post('/api/collection/update','CollectionController@update');
 Route::post('/api/collection/delete','CollectionController@delete');
-
+Route::post('/api/collection/reports/category_summary','CollectionController@reports_orcategorysummary');
 
 // transaction reports
 Route::get('/transaction/reports/comparative','TransactionController@comparative');
-
+Route::post('/api/transaction/reports/monthend_posting','TransactionController@monthEndPosting');
+Route::post('/api/transaction/reports/get/monthend_posting','TransactionController@getMonthEndPostingDetails');
+Route::get('/transaction/reports/currentbalance','TransactionController@currentbalance');
 
 // transaction post
 Route::post('/api/transaction/post','TransactionController@post');
-
 
 // expenses
 Route::get('/expense/view','ExpenseController@index');
@@ -76,10 +70,10 @@ Route::post('/api/expense/category/create','ExpenseCategoryController@create');
 Route::post('/api/expense/category/type/create','ExpenseCategoryTypeController@create');
 Route::post('/api/expense/category/type/get','ExpenseCategoryTypeController@get');
 // Route::group(['prefix'=>'api/person'], function() {
-// 	Route::get('/get',[
-// 		'as'=>'getPersonProfile',
-// 		'uses'=> 'PersonController@getPersonProfile'
-// 	]);
+//  Route::get('/get',[
+//    'as'=>'getPersonProfile',
+//    'uses'=> 'PersonController@getPersonProfile'
+//  ]);
 // });
 // Route::get('/person/create','PersonController@index');
 // Route::get('/person/finder','PersonController@store');
@@ -92,5 +86,8 @@ Route::post('/api/expense/category/type/get','ExpenseCategoryTypeController@get'
 
 // });
 Auth::routes();
+// login
+Route::get('/login','LoginController@index');
+Route::post('/api/login','LoginController@login');
 
 Route::get('/home', 'HomeController@index')->name('home');

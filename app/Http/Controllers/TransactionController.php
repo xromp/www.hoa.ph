@@ -166,4 +166,243 @@ class TransactionController extends Controller
             'message'=>"Successfully posted."
         ]);
     }
+
+    public function monthEndPosting(Request $request)
+    {
+        $formData = array(
+            'month'=>$request->input('month'),
+            'year'=>$request->input('year')
+        );
+
+        $isPosted = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('refid',$formData['month']."".$formData['year'])
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->first();
+        if ($isPosted) {
+            return response()->json([
+                'status'=>403,
+                'data'=>'',
+                'message'=>'Already posted.'
+            ]);
+        }
+
+        $transaction = DB::transaction(function($formData) use($formData){
+            $amount = 0;
+
+
+            $collection = DB::table('transaction')
+                ->select(DB::raw('SUM(amount) as amount'))
+                ->where('posted',1)
+                ->where('deleted',0)
+                ->where('closed',0)
+                ->where('trantype','COLLECTION')
+                ->whereMonth('refdate',$formData['month'])
+                ->whereYear('refdate',$formData['year'])
+                ->first();
+            if ($collection->amount) {
+                $amount = $collection->amount;
+            }
+
+            $transaction = new Transaction;
+            $transaction->trantype          = 'CLOSING';
+            $transaction->trantype1         = 'COLLECTION';
+            $transaction->refid             = $formData['month']."".$formData['year'];
+            $transaction->refdate           = date("Y-m-d H");
+            $transaction->amount            = $amount;
+            $transaction->posted            = 1;
+            $transaction->closed            = 0;
+            $transaction->datefinancial     = date("Y-m-d H");
+            $transaction->save();
+
+            $amount = 0;
+
+            $expense = DB::table('transaction')
+                ->select(DB::raw('SUM(amount) as amount'))
+                ->where('posted',1)
+                ->where('closed',0)
+                ->where('deleted',0)
+                ->where('trantype','EXPENSE')
+                ->whereMonth('refdate',$formData['month'])
+                ->whereYear('refdate',$formData['year'])
+                ->first();
+            if ($expense->amount) {
+                $amount = $expense->amount;
+            }
+            $transaction = new Transaction;
+            $transaction->trantype          = 'CLOSING';
+            $transaction->trantype1         = 'EXPENSE';
+            $transaction->refid             = $formData['month']."".$formData['year'];
+            $transaction->refdate           = date("Y-m-d H");
+            $transaction->amount            = $amount;
+            $transaction->posted            = 1;
+            $transaction->closed            = 0;
+            $transaction->datefinancial     = date("Y-m-d H");
+            $transaction->save();
+
+            $updateTransaction = DB::table('transaction')
+                ->whereMonth('refdate',$formData['month'])
+                ->whereYear('refdate',$formData['year'])
+                ->where('posted',1)
+                ->where('closed',0)
+                ->where('deleted',0)
+                ->where(function($q){
+                    $q->where('trantype','COLLECTION')
+                      ->orWhere('trantype','EXPENSE');
+                })
+                ->update(['closed'=>1]);
+
+            if ($updateTransaction) {
+                return response()-> json([
+                    'status'=>200,
+                    'data'=>'',
+                    'message'=>'Successfully posted.'
+                ]);
+            }
+        });
+        return $transaction;
+    }
+
+    public function getMonthEndPostingDetails(Request $request){
+        $formData = array(
+            'month'=>$request->input('month'),
+            'year'=>$request->input('year')
+        );
+        $totalCollection = 0;
+        $totalExpense = 0;
+
+        $expense = DB::table('transaction')
+            ->select(DB::raw('SUM(amount) as amount'))
+            ->where('posted',1)
+            ->where('closed',0)
+            ->where('deleted',0)
+            ->where('trantype','EXPENSE')
+            ->whereMonth('refdate',$formData['month'])
+            ->whereYear('refdate',$formData['year'])
+            ->first();
+        if ($expense->amount) {
+            $totalExpense = $expense->amount;
+        }
+
+        $collection = DB::table('transaction')
+            ->select(DB::raw('SUM(amount) as amount'))
+            ->where('posted',1)
+            ->where('closed',0)
+            ->where('deleted',0)
+            ->where('trantype','COLLECTION')
+            ->whereMonth('refdate',$formData['month'])
+            ->whereYear('refdate',$formData['year'])
+            ->first();
+        if ($collection->amount) {
+            $totalCollection = $collection->amount;
+        }
+
+        return response()->json([
+            'status'=>'200',
+            'data'=>array(
+                'total_collection'=>$totalCollection,
+                'total_expense'=>$totalExpense
+            ),
+            'message'=>''
+        ]);
+    }
+
+    public function currentbalance(Request $request){
+        $formData = array(
+            'month' => $request->input('month'),
+            'year' => $request->input('year')
+        );
+
+        $totalPrevCollection = 0;
+        $totalPrevExpense = 0;
+        $totalCurrentExpense = 0;
+        $totalCurrentCollections = 0;
+
+        $closedCollection = DB::Table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('trantype1','COLLECTION')
+            ->where('posted',1)
+            ->where('closed',0)
+            ->where('deleted',0)
+            ->where('refid',sprintf('%02d', $formData['month']-1)."".$formData['year'])
+            ->first();
+
+        if ($closedCollection) {
+            $totalPrevCollection= $closedCollection->amount;
+        }
+        
+        $closedExpense = DB::Table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('trantype1','EXPENSE')
+            ->where('posted',1)
+            ->where('closed',0)
+            ->where('deleted',0)
+            ->where('refid',sprintf('%02d', $formData['month']-1)."".$formData['year'])
+            ->first();
+
+        if ($closedExpense) {
+            $totalPrevExpense= $closedExpense->amount;
+        }
+
+        $currentCollection = DB::table('transaction as t')
+            ->select(
+                DB::raw('COALESCE(c.category,"") as category'), 
+                DB::raw('MAX(COALESCE(cc.description,"")) as category_desc'), 
+                DB::raw('sum(COALESCE(t.amount,0)) as amount')
+            )
+            ->leftjoin('collection as c','t.refid','=','c.orno')
+            ->leftjoin('collection_category as cc','cc.code','=','c.category')
+            ->where('trantype','COLLECTION')
+            ->whereMonth('refdate',$formData['month'])
+            ->whereYear('refdate',$formData['year'])
+            ->where('t.posted',1)
+            ->where('t.closed',0)
+            ->where('t.deleted',0)
+            ->where('c.posted',1)
+            ->where('c.deleted',0)
+            ->groupBy('c.category')
+            ->get();
+
+        foreach ($currentCollection as $key => $exp) {
+            $totalCurrentCollections += $exp->amount;
+        }
+
+        $currentExpense = DB::table('transaction as t')
+            ->select(
+                DB::raw('COALESCE(c.category,"") as category'), 
+                DB::raw('MAX(COALESCE(cc.description,"")) as category_desc'), 
+                DB::raw('sum(COALESCE(t.amount,0)) as amount')
+            )
+            ->leftjoin('expense as c','t.refid','=','c.orno')
+            ->leftjoin('expense_category as cc','cc.code','=','c.category')
+            ->where('trantype','EXPENSE')
+            ->where('t.posted',1)
+            ->where('t.closed',0)
+            ->where('t.deleted',0)
+            ->where('c.posted',1)
+            ->where('c.deleted',0)
+            ->groupBy('c.category')
+            ->get();
+
+        foreach ($currentExpense as $key => $exp) {
+            $totalCurrentExpense += $exp->amount;
+        }
+        $data = array(
+            'data'=>array(
+                'collection'=>array(
+                    'details'=> $currentCollection,
+                    'details_total'=> $totalCurrentCollections,
+                    'prev_total'=>$totalPrevCollection
+                ),
+                'expense'=>array(
+                    'details'=>$currentExpense,
+                    'details_total'=> $totalCurrentExpense,
+                    'prev_total'=>$totalPrevExpense
+                )
+            ),
+            'formData' => $formData
+        );
+        return view('collection.reports.current-balance', array('data'=>$data));
+    }
 }

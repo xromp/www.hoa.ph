@@ -27,7 +27,7 @@
 		</tr>
 		@endforeach
 		<tr>
-			<td colspan="5">Total</td>
+			<td colspan="3">Total</td>
 			<td class="text-right">{{ $data['total']}}</td>
 		</tr>
 	</tbody>

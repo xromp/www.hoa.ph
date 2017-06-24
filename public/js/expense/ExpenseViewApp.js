@@ -49,7 +49,7 @@ define([
         
         vm.post = function(i) {
           var formDataCopy = angular.copy(i)
-          formDataCopy.refid = formDataCopy.orno;
+          formDataCopy.refid = formDataCopy.pcv;
           formDataCopy.refdate = $filter('date')(formDataCopy.ordate,'yyyy-MM-dd');
           formDataCopy.trantype = 'EXPENSE';
 

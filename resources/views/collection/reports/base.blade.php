@@ -13,9 +13,9 @@
         <form name="frmReport">
           <div class="row">
             <div class="col-md-5 form-group">
-              <select class="form-control col-md-7 col-xs-12" ng-model="rc.query.reporturl" ng-init="cc.getRefList(rc.query)" ng-change="cc.getRefList(rc.query)" required>
+              <select class="form-control col-md-7 col-xs-12" ng-model="rc.query.reporturl" required>
                 <option ng-repeat="type in rc.reportList" ng-bind="type.description" ng-value="type.url"></option>
-              </select>            
+              </select>
             </div>
           </div>
           <div class="row">
@@ -54,7 +54,9 @@
                     <div class="row">
                       <div class="col-md-12">
                         <div class="pull-right">
-                          <button class="btn btn-default" ng-click="rc.generateReport(rc.query)">Generate Report</button>
+                          <button class="btn btn-info" ng-click="rc.generateReport(rc.query)" ng-if="rc.query.reporturl">Generate Report</button>
+                          <button class="btn btn-info" ng-click="rc.generateXLS(rc.query)" ng-if="!rc.query.reporturl">Generate XLS</button>
+                          
                         </div>
                       </div>
                     </div>

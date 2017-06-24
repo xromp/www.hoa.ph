@@ -30,6 +30,7 @@
               <li><a ng-click="sc.routeTo('/person/finder')">Members</a></li>
               <li><a ng-click="sc.routeTo('/collection/view')">Collection Entry</a></li>
               <li><a ng-click="sc.routeTo('/expense/view')">Expense Entry</a></li>
+              <li><a ng-click="sc.monthEndPost()">Monthly End Posting</a></li>
               <li><a ng-click="sc.routeTo('/collection/reports')">Reports</a></li>
             </ul>
           </li>
@@ -39,3 +40,6 @@
     <!-- /sidebar menu -->
   </div>
 </div>
+<script type="text/ng-template" id="layouts.month-end-posting">
+  @include('layouts.month-end-posting')
+</script>

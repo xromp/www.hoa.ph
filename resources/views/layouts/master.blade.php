@@ -46,7 +46,11 @@
 
   <script type="text/javascript" src="{{URL::to('assets/angular/angular.min.js')}}"></script>
   <script type="text/javascript" src="{{URL::to('assets/angular-route/angular-route.min.js')}}"></script>
-
+  <script type="text/javascript" src="{{URL::to('assets/others/js/ui-bootstrap-tpls-2.5.0.min.js')}}"></script>
+  
+  <script type="text/javascript" src="{{URL::to('assets/alasql/alasql.min.js')}}"></script>
+  <script type="text/javascript" src="{{URL::to('assets/alasql/xlsx.core.min.js')}}"></script>
+  
   <script data-main="{{URL::to('js/module-loader/requirejs-config.js')}}" src="{{URL::to('assets/requirejs/require.js')}}"></script>
   <script type="text/javascript" src="{{URL::to('js/layouts/SidebarApp.js')}}"></script>
   <!-- <script type="text/javascript" src="{{URL::to('js/layouts/layouts.js')}}"></script> -->
