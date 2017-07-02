@@ -6,13 +6,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Student Information Management System | </title>
+    <title>GREVHAI | Financial System </title>
          <!-- No Cache BEGIN -->
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="no-cache">
     <meta http-equiv="Expires" content="-1">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
 
+    <link rel="icon" href="{{URL::to('assets/images/grevhai-logo.ico')}}">
     <link rel="stylesheet" type="text/css" href="{{URL::to('assets/bootstrap/dist/css/bootstrap.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{URL::to('assets/angular-block-ui/dist/angular-block-ui.min.css')}}">
     <link rel="stylesheet" href="{{URL::to('assets/font-awesome/css/font-awesome.min.css')}}">
@@ -20,8 +21,6 @@
     <link rel="stylesheet" href="{{URL::to('assets/custom/css/custom.min.css')}}">
 
     <link rel="stylesheet" href="{{URL::to('assets/angular-ui-select/dist/select.min.css')}}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
     <base href="/">
      <!-- No Cache END-->
   </head>
@@ -52,6 +51,7 @@
   <script type="text/javascript" src="{{URL::to('assets/alasql/xlsx.core.min.js')}}"></script>
   
   <script data-main="{{URL::to('js/module-loader/requirejs-config.js')}}" src="{{URL::to('assets/requirejs/require.js')}}"></script>
+  <script type="text/javascript" src="{{URL::to('js/layouts/NavApp.js')}}"></script>
   <script type="text/javascript" src="{{URL::to('js/layouts/SidebarApp.js')}}"></script>
   <!-- <script type="text/javascript" src="{{URL::to('js/layouts/layouts.js')}}"></script> -->
   @yield('scripts')

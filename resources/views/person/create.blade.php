@@ -242,7 +242,7 @@
           <div class="ln_solid"></div>
           <div class="form-group">
             <div class="pull-right">
-              <button type="reset" class="btn btn-default" ng-click="p.cancel()">Cancel</button>
+              <button type="reset" class="btn btn-danger" ng-click="p.cancel()"><i class="fa fa-arrow-left"></i> View Finder</button>
               <button type="reset" class="btn btn-default" ng-click="p.reset()">Reset</button>
               <button type="submit" class="btn btn-success" ng-click="p.submit(p.personInfo)" ng-disabled="p.frmCreate.$invalid && p.frmCreate.withError" ng-bind="(p.personInfo.action=='CREATE')?'Submit':'Update'"></button>
             </div>

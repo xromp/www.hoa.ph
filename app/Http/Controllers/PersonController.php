@@ -13,6 +13,7 @@ use App\Collection;
 use App\Collection_line;
 use App\Transaction;
 use DB;
+use Session;
 class PersonController extends Controller
 {
 
@@ -378,5 +379,16 @@ class PersonController extends Controller
             ]);
         });
         return $transaction;
+    }
+
+    public function getPersonProfileList(Request $request)
+    {
+        $person_profile = DB::select('CALL sp_personprofile(?,?)',array(0,'HOMEOWNER'));
+        $data = array(
+            'data'=>array(
+                'personlist'=>$person_profile
+            )
+        );
+        return view('collection.reports.person-list', array('data'=>$data));
     }
 }

@@ -68,7 +68,6 @@ class ExpenseController extends Controller
         $message = '';
 
         $validator = Validator::make($request->all(),[
-            'pcv'                => 'required',
             'amount'                => 'required',
             'category_code'         => 'required',
             'category_type_code'    => 'required',
@@ -90,7 +89,6 @@ class ExpenseController extends Controller
             $expenses_line = new Expense_line;
 
             $data = array();
-            $data['pcv']               = $request-> input('pcv');
             $data['orno']               = $request-> input('orno');
             $data['ordate']             = $request-> input('ordate');
             $data['category_code']      = $request-> input('category_code');
@@ -100,67 +98,77 @@ class ExpenseController extends Controller
             $data['remarks']            = $request-> input('remarks');
             $data['establishment']      = $request-> input('establishment');
 
-            $isOrnoExist = $expense
-                        -> where('pcv','=',$data['pcv'])
-                        -> where('deleted',0)
-                        -> first();
+            $orMonthYear = date('mY',strtotime($data['ordate']));
 
-            if ($isOrnoExist) {
+            $isClosed = DB::table('transaction')
+                ->where('trantype','CLOSING')
+                ->where('refid',$orMonthYear)
+                ->where('posted',1)
+                ->where('deleted',0)
+                ->first();
+
+            if ($isClosed) {
                 return response()->json([
-                    'status'=> 403,
+                    'status'=>403,
                     'data'=>'',
-                    'message'=>"PCV no. {$data['pcv']} is already exists."
-                ]);         
-            } else {
-                // saving collections
-                $transaction = DB::transaction(function($data) use($data){
-                    // dd($data['orno']);
-                    $expense = new Expense;
-                    
-                    $expense->orno              = $data['orno'];
-                    $expense->pcv               = $data['pcv'];;
-                    $expense->ordate            = $data['ordate'];
-                    $expense->category          = $data['category_code'];
-                    $expense->category_type     = $data['category_type_code'];
-                    $expense->amount            = $data['amount'];
-                    $expense->establishment     = $data['establishment'];
-                    $expense->remarks           = $data['remarks'];
-                    
-                    $expense->save();
-
-
-                    if($expense->id)
-                    {
-                        foreach ($data['entityvalues'] as $key => $entityvalue) {
-                            $expense_line = new Expense_line;
-
-                            $expense_line->expenseid = $expense->id;
-                            $expense_line->entityvalue1 = $entityvalue['entityvalue1'];
-                            $expense_line->entityvalue2 = $entityvalue['entityvalue2'];
-                            $expense_line->entityvalue3 = $entityvalue['entityvalue3'];
-                            $expense_line->save();
-
-                            if (!$expense_line->id) {
-                                throw new \Exception('Expense line not created.');
-                            }
-                        } 
-                    }
-                    else 
-                    {
-                        throw new \Exception('Expense not created.');
-                    }
-
-                    return response()->json([
-                        'status'=> 200,
-                        'data'=>array(
-                            'pcv'=>0
-                        ),
-                        'message'=>"Successfully saved."
-                    ]);         
-
-                });
-
+                    'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction."
+                ]);
             }
+            
+            $transaction = DB::transaction(function($data) use($data){
+                $pcv = 1;
+                $expense = new Expense;
+                $pcvLastest = DB::table('expense')
+                    ->where('deleted',0)
+                    ->orderBy('pcv','desc')
+                    ->first();
+                if ($pcvLastest) {
+                    $pcv = $pcvLastest->pcv+1;
+                }
+
+                $expense->orno              = $data['orno'];
+                $expense->pcv               = $pcv;
+                $expense->ordate            = $data['ordate'];
+                $expense->category          = $data['category_code'];
+                $expense->category_type     = $data['category_type_code'];
+                $expense->amount            = $data['amount'];
+                $expense->establishment     = $data['establishment'];
+                $expense->remarks           = $data['remarks'];
+                
+                $expense->save();
+
+
+                if($expense->id)
+                {
+                    foreach ($data['entityvalues'] as $key => $entityvalue) {
+                        $expense_line = new Expense_line;
+
+                        $expense_line->expenseid = $expense->id;
+                        $expense_line->entityvalue1 = $entityvalue['entityvalue1'];
+                        $expense_line->entityvalue2 = $entityvalue['entityvalue2'];
+                        $expense_line->entityvalue3 = $entityvalue['entityvalue3'];
+                        $expense_line->save();
+
+                        if (!$expense_line->id) {
+                            throw new \Exception('Expense line not created.');
+                        }
+                    } 
+                }
+                else 
+                {
+                    throw new \Exception('Expense not created.');
+                }
+
+                return response()->json([
+                    'status'=> 200,
+                    'data'=>array(
+                        'pcv'=>0
+                    ),
+                    'message'=>"PCV No. {$pcv} Successfully saved."
+                ]);         
+
+            });
+
             return $transaction;
         }    
     }
@@ -275,6 +283,8 @@ class ExpenseController extends Controller
 
         $isORNoExist = DB::table('transaction')
             -> where('refid',$formData['orno'])
+            ->where('trantype','EXPENSE')
+            ->where('deleted',0)
             -> first();
 
         if ($isORNoExist) {
@@ -290,7 +300,7 @@ class ExpenseController extends Controller
 
         DB::transaction(function($formData) use($formData){
             DB::table('expense')
-                -> where('orno',$formData['orno'])
+                -> where('pcv',$formData['orno'])
                 -> update(['deleted'=>1]);
         });
 

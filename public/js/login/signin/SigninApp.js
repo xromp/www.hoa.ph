@@ -68,7 +68,7 @@ define([
             var formData = angular.toJson(data)
             return $http({
               method:'POST',
-              url: '/api/login',
+              url: '/api/user/login',
               data:formData,
               headers: {'Content-Type': 'application/json','Authorization': data.username+':'+ data.password}
             })

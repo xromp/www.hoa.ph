@@ -110,6 +110,7 @@ define([
             modalInstance.result.then(function (){
             },function (){
             });
+            vm.search(vm.query);  
           },function(){alert('Error occured')});
         };
 

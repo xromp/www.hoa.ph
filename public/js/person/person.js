@@ -5,7 +5,7 @@ define('sims.person',[
 ], function(angular, dependencyResolver){
 	'use strict';
 	 app = angular
-		.module('sims.person',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select', function() {
+		.module('sims.person',['NavApp','SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select', function() {
 		}])
 		.config(Config)
 
@@ -19,7 +19,6 @@ define('sims.person',[
 				service    :$provide.service,
 				blockUI    : blockUIConfig,
 			}
-			console.log('peson');
 
 	    	$interpolateProvider.startSymbol('<%');
     		$interpolateProvider.endSymbol('%>');

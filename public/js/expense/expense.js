@@ -5,7 +5,7 @@ define('sims.expense',[
 ], function(angular, dependencyResolver){
 	'use strict';
 	 app = angular
-		.module('sims.expense',['SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select'])
+		.module('sims.expense',['NavApp','SidebarApp','ngRoute','ngAnimate','ngSanitize','ui.bootstrap', 'blockUI','ui.select'])
 		.config(Config)
 
 		Config.$inject = ['$routeProvider', '$locationProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide', 'blockUIConfig', '$interpolateProvider']

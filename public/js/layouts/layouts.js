@@ -1,1 +1,1 @@
-var commentApp = angular.module('layoutApp', ['SidebarApp']);
+var commentApp = angular.module('layoutApp', ['SidebarApp','NavApp']);

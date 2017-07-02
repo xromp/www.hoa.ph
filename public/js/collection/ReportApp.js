@@ -17,21 +17,27 @@ define([
           vm.query = {
             'startdate':new Date(vm.curDate.getFullYear(),vm.curDate.getMonth()),
             'enddate':new Date(vm.curDate.getFullYear(),vm.curDate.getMonth()+1,0),
-            'reporturl':'/collection/reports/orlisting'
+            'code':'ORLISTING'
           };
         };
 
         vm.reportList = [
           {'id':1,'code':'ORLISTING','description':'OR Listing','url':'/collection/reports/orlisting'},
-          {'id':2,'code':'SUMMARYCOLLECTION','description':'Summary Collection & Expense','url':'/transaction/reports/comparative'},
           {'id':3,'code':'ORCHECKLIST','description':'OR Checklist','url':''},
-          {'id':4,'code':'CURRENTBALANCE','description':'Current Balance for the month','url':'/transaction/reports/currentbalance'}
+          {'id':2,'code':'SUMMARYCOLLECTION','description':'Summary Collection & Expense','url':'/transaction/reports/comparative'},
+          {'id':4,'code':'CURRENTBALANCE','description':'Current Balance for the month','url':'/transaction/reports/currentbalance'},
+          {'id':5,'code':'PERSONLIST','description':'Members List','url':'/person/report/getpersonprofile'}
         ];
 
         vm.generateReport = function(data) {
           var dataCopy = angular.copy(data);
           var windowOrlisting;
-
+          angular.forEach(vm.reportList, function(v, k){
+            if (v.code == dataCopy.code) {
+              dataCopy.reporturl = v.url;
+            };
+          });
+          console.log(dataCopy.reporturl);
           dataCopy.startdate = $filter('date')(dataCopy.startdate,'yyyy-MM-dd');
           dataCopy.enddate = $filter('date')(dataCopy.enddate,'yyyy-MM-dd');
           

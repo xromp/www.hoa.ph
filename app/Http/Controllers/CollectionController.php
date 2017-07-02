@@ -13,6 +13,7 @@ use App\Collection_line;
 
 class CollectionController extends Controller
 {
+
     public function index()
     {
         return view('collection.index') ;
@@ -40,79 +41,97 @@ class CollectionController extends Controller
                 'message'=>'Unable to save.'
             ]);
 
+        }
+
+
+        $collection = new Collection;
+        $collection_line = new Collection_line;
+
+        $data = array();
+        $data['orno']           = $request-> input('orno');
+        $data['ordate']         = $request-> input('ordate');
+        $data['type']           = $request-> input('type');
+        $data['personid']       = $request-> input('personid');
+        $data['category_code']  = $request-> input('category_code');
+        $data['amount']         = $request-> input('amount');
+        $data['entityvalues']   = $request-> input('entityvalues');
+        $data['remarks']        = $request-> input('remarks');
+
+        $orMonthYear = date('mY',strtotime($data['ordate']));
+
+        $isClosed = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('refid',$orMonthYear)
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->first();
+
+        if ($isClosed) {
+            return response()->json([
+                'status'=>403,
+                'data'=>'',
+                'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction."
+            ]);
+        }
+
+        $isOrnoExist = $collection
+                    -> where('orno','=',$data['orno'])
+                    -> where('deleted',0)
+                    -> first();
+
+        if ($isOrnoExist) {
+            return response()->json([
+                'status'=> 403,
+                'data'=>'',
+                'message'=>"OR no. {$data['orno']} is already exists."
+            ]);         
         } else {
-            $collection = new Collection;
-            $collection_line = new Collection_line;
+            // saving collections
+            DB::transaction(function($data) use($data){
+                // dd($data['orno']);
+                $collection = new Collection;
+                
+                $collection->orno           = $data['orno'];
+                $collection->ordate         = $data['ordate'];
+                $collection->type           = $data['type'];
+                $collection->personid       = $data['personid'];
+                $collection->category       = $data['category_code'];
+                $collection->amount         = $data['amount'];
+                $collection->remarks        = $data['remarks'];
+                
+                $collection->save();
 
-            $data = array();
-            $data['orno']           = $request-> input('orno');
-            $data['ordate']         = $request-> input('ordate');
-            $data['type']           = $request-> input('type');
-            $data['personid']       = $request-> input('personid');
-            $data['category_code']  = $request-> input('category_code');
-            $data['amount']     = $request-> input('amount');
-            $data['entityvalues']   = $request-> input('entityvalues');
-            $data['remarks']        = $request-> input('remarks');
+                if($collection->id)
+                {
+                    if ($data['entityvalues'][0]['entityvalue1']) {
+                        foreach ($data['entityvalues'] as $key => $entityvalue) {
+                            $collection_line = new Collection_line;
 
-            $isOrnoExist = $collection
-                        -> where('orno','=',$data['orno'])
-                        -> where('deleted',0)
-                        -> first();
+                            $collection_line->collectionid = $collection->id;
+                            $collection_line->entityvalue1 = $entityvalue['entityvalue1'];
+                            $collection_line->entityvalue2 = $entityvalue['entityvalue2'];
+                            $collection_line->entityvalue3 = $entityvalue['entityvalue3'];
+                            $collection_line->save();
 
-            if ($isOrnoExist) {
-                return response()->json([
-                    'status'=> 403,
-                    'data'=>'',
-                    'message'=>"OR no. {$data['orno']} is already exists."
-                ]);         
-            } else {
-                // saving collections
-                DB::transaction(function($data) use($data){
-                    // dd($data['orno']);
-                    $collection = new Collection;
-                    
-                    $collection->orno           = $data['orno'];
-                    $collection->ordate         = $data['ordate'];
-                    $collection->type           = $data['type'];
-                    $collection->personid       = $data['personid'];
-                    $collection->category       = $data['category_code'];
-                    $collection->amount         = $data['amount'];
-                    $collection->remarks        = $data['remarks'];
-                    
-                    $collection->save();
-
-                    if($collection->id)
-                    {
-                        if ($data['entityvalues'][0]['entityvalue1']) {
-                            foreach ($data['entityvalues'] as $key => $entityvalue) {
-                                $collection_line = new Collection_line;
-
-                                $collection_line->collectionid = $collection->id;
-                                $collection_line->entityvalue1 = $entityvalue['entityvalue1'];
-                                $collection_line->entityvalue2 = $entityvalue['entityvalue2'];
-                                $collection_line->entityvalue3 = $entityvalue['entityvalue3'];
-                                $collection_line->save();
-
-                                if (!$collection_line->id) {
-                                    throw new \Exception('Collection line not created.');
-                                }
+                            if (!$collection_line->id) {
+                                throw new \Exception('Collection line not created.');
                             }
                         }
                     }
-                    else 
-                    {
-                        throw new \Exception('Collection not created.');
-                    }
-                });
+                }
+                else 
+                {
+                    throw new \Exception('Collection not created.');
+                }
+            });
 
-            }
+        }
 
-            return response()->json([
-                'status'=> 200,
-                'data'=>'',
-                'message'=>'Successfully saved.'
-            ]);         
-        }    
+        return response()->json([
+            'status'=> 200,
+            'data'=>'',
+            'message'=>'Successfully saved.'
+        ]);
     }
 
     public function update(Request $request)
@@ -355,6 +374,8 @@ class CollectionController extends Controller
 
         $isORNoExist = DB::table('transaction')
             -> where('refid',$formData['orno'])
+            ->where('trantype','COLLECTION')
+            ->where('deleted',0)
             -> first();
 
         if ($isORNoExist) {

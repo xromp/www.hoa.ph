@@ -25,7 +25,8 @@ class LoginController extends Controller
             'password'=> $request->input('password'),
         );
 
-        if (Auth::attempt(['username' => 'admin','password'=>$formData['password']])) {
+        if (Auth::attempt(['username' => $formData['username'],'password'=>$formData['password']])) {
+            $request->session()->put('username',$formData['username']);
             return response() ->json([
                 'status'=>200,
                 'message'=>'Successfully login.',
@@ -38,5 +39,10 @@ class LoginController extends Controller
                 'data'=>''
             ]);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        $request->session()->flush();
     }
 }
