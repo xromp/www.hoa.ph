@@ -364,6 +364,19 @@ class PersonController extends Controller
         );
         
         $transaction = DB::transaction(function($formData) use($formData){
+            $hasCollection = DB::table('collection')
+                -> where('personid',$formData['personid'])
+                -> where('deleted',0)
+                -> first();
+
+            if ($hasCollection) {
+                return response() -> json([
+                    'status'=>403,
+                    'data'=>'',
+                    'message'=>"Member has collection transaction. Unable to delete."
+                ]);
+            }
+
             $updated = DB::table('person')
                 -> where('personid',$formData['personid'])
                 -> update(['deleted'=>1]);

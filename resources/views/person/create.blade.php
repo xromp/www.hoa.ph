@@ -60,7 +60,7 @@
               <div class="form-group" ng-class="{'has-error': p.frmCreate.lname.$invalid && p.frmCreate.withError }">
                 <label class="control-label">Last Name <span class="required">*</span>
                 </label>
-                <input type="text" name="lname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.lname" required>
+                <input type="text" name="lname" class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.lname" required>
                   <span class="help-block" ng-show="p.frmCreate.lname.$invalid && p.frmCreate.withError">Last name is required field.</span>
               </div>
             </div>
@@ -69,7 +69,7 @@
               <div class="form-group" ng-class="{'has-error': p.frmCreate.fname.$invalid && p.frmCreate.withError }">
                 <label class="control-label">First Name <span class="required">*</span>
                 </label>
-                <input type="text" name="fname"  class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.fname" required>
+                <input type="text" name="fname"  class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.fname" required>
                 <span class="help-block" ng-show="p.frmCreate.fname.$invalid && p.frmCreate.withError">First name is required field.</span>
               </div>
             </div>
@@ -77,7 +77,7 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label class="control-label">Middle Name / Initial</label>
-                <input type="text" name="mname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.mname">
+                <input type="text" name="mname" class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.mname">
               </div>
             </div>
           </div>
@@ -117,7 +117,7 @@
                 <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_lname.$invalid && p.frmCreate.withError }">
                   <label class="control-label">Last Name <span class="required">*</span>
                   </label>
-                  <input type="text" name="wife_lname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_lname" required>
+                  <input type="text" name="wife_lname" class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.wife_lname">
                     <span class="help-block" ng-show="p.frmCreate.wife_lname.$invalid && p.frmCreate.withError">Last name is required field.</span>
                 </div>
               </div>
@@ -126,7 +126,7 @@
                 <div class="form-group" ng-class="{'has-error': p.frmCreate.wife_fname.$invalid && p.frmCreate.withError }">
                   <label class="control-label">First Name <span class="required">*</span>
                   </label>
-                  <input type="text" name="wife_fname"  class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_fname" required>
+                  <input type="text" name="wife_fname"  class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.wife_fname">
                   <span class="help-block" ng-show="p.frmCreate.wife_fname.$invalid && p.frmCreate.withError">First name is required field.</span>
                 </div>
               </div>
@@ -134,7 +134,7 @@
               <div class="col-md-4">
                 <div class="form-group">
                   <label class="control-label">Middle Name / Initial</label>
-                  <input type="text" name="wife_mname" class="form-control col-md-7 col-xs-12" ng-model="p.personInfo.wife_mname">
+                  <input type="text" name="wife_mname" class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="p.personInfo.wife_mname">
                 </div>
               </div>
             </div>
@@ -180,14 +180,14 @@
             <div class="col-md-4">
               <div class="form-group" ng-class="{'has-error': p.frmCreate.address_city.$invalid && p.frmCreate.withError }">
                 <label class="control-label">Municipality/City <span class="required">*</span></label>
-                <input type="text" name="address_city" class="form-control" ng-model="p.personInfo.address_city" placeholder="Municipality/City" required>
+                <input type="text" name="address_city" class="form-control" ng-model="p.personInfo.address_city" placeholder="Municipality/City">
                 <span class="help-block" ng-show="p.frmCreate.address_city.$invalid && p.frmCreate.withError">Municipality/City is required field.</span>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group" ng-class="{'has-error': p.frmCreate.address_province.$invalid && p.frmCreate.withError }">
                 <label class="control-label">Province <span class="required">*</span></label>
-                <input type="text" name="address_province" class="form-control" ng-model="p.personInfo.address_province" placeholder="Municipality/City" required>
+                <input type="text" name="address_province" class="form-control" ng-model="p.personInfo.address_province" placeholder="Municipality/City">
                 <span class="help-block" ng-show="p.frmCreate.address_province.$invalid && p.frmCreate.withError">Province is required field.</span>
               </div>
             </div>

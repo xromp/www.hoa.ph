@@ -75,7 +75,7 @@
               <td class="">
                 <div class="pull-right">
                   <button class="btn btn-info btn-xs" ng-click="pf.edit(person);$event.stopPropagation();"><i class="glyphicon glyphicon-pencil"></i></button>
-                  <button class="btn btn-danger btn-xs" ng-click="pf.remove();$event.stopPropagation();"><i class="glyphicon glyphicon-remove"></i></button>
+                  <button class="btn btn-danger btn-xs" ng-click="pf.remove(person);$event.stopPropagation();"><i class="glyphicon glyphicon-remove"></i></button>
                 </div>
               </td>
               <!-- <td ng-bind="person.type"></td> -->

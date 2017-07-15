@@ -74,6 +74,7 @@ define([
             vm.frmCreate.withError = false;
             
             var dataCopy = angular.copy(data);
+            dataCopy.orno = dataCopy.orno.toUpperCase();
             dataCopy.ordate = $filter('date')(dataCopy.ordate,'yyyy-MM-dd');
             dataCopy.entityvalues = [];
 

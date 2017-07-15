@@ -37,6 +37,13 @@ define([
           if (vm.frmCreate.$valid) {
             vm.frmCreate.withError = false;
             var dataCopy = angular.copy(data);
+            dataCopy.lname = dataCopy.lname.toUpperCase();
+            dataCopy.fname = dataCopy.fname.toUpperCase();
+            dataCopy.mname = dataCopy.mname.toUpperCase();
+            dataCopy.wife_lname = dataCopy.wife_lname.toUpperCase();
+            dataCopy.wife_fname = dataCopy.wife_fname.toUpperCase();
+            dataCopy.wife_mname = dataCopy.wife_mname.toUpperCase();
+            
             dataCopy.action = vm.personInfo.action;
             dataCopy.birthday = $filter('date')(dataCopy.birthday,'yyyy-MM-dd');
             dataCopy.wife_birthday = $filter('date')(dataCopy.wife_birthday,'yyyy-MM-dd');
@@ -47,8 +54,7 @@ define([
             PersonSrvcs.save(formData)
             .then (function (response) {
               if (response.data.status == 200) {
-                
-                vm.personInfo = {};
+                vm.default();
               } else {
 
               }

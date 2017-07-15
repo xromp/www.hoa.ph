@@ -26,6 +26,6 @@
 
 
 @section('scripts')
-<script type="text/javascript" src="{{URL::to('js/collection/collection.js')}}"></script>
+<script type="text/javascript" src="{{URL::to('js/collection/collection.js?v=20170716')}}"></script>
 @endsection
 

@@ -30,15 +30,15 @@
               </div>
 
               <div class="form-group" ng-class="{'has-error': cc.frmCreate.orno.$invalid && cc.frmCreate.withError }">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12">OR No.</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">Ref No.<span class="required">*</span></label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <input type="number" name="orno" min='1' class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.orno" ng-disabled="cc.collectionDetails.action == 'EDIT'" required>
+                  <input type="text" name="orno" class="form-control col-md-7 col-xs-12 text-uppercase" ng-model="cc.collectionDetails.orno" ng-disabled="cc.collectionDetails.action == 'EDIT'" required>
                   <span class="help-block" ng-show="cc.frmCreate.orno.$invalid && cc.frmCreate.withError">OR No. is required field.</span>
                 </div>
               </div>
 
               <div class="form-group" ng-class="{'has-error': cc.frmCreate.ordate.$invalid && cc.frmCreate.withError }">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12">OR Date <span class="required">*</span></label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">Ref Date <span class="required">*</span></label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
                 <p class="input-group">
                   <input type="text" class="form-control" name="ordate" uib-datepicker-popup="MM/dd/yyyy" ng-model="cc.collectionDetails.ordate" is-open="cc.dtIsOpen" datepicker-options="dateOptions" close-text="Close" alt-input-formats="altInputFormats" required/>

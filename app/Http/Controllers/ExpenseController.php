@@ -114,6 +114,24 @@ class ExpenseController extends Controller
                     'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction."
                 ]);
             }
+
+            $getLastPostMonth = DB::table('transaction')
+                ->where('trantype','CLOSING')
+                ->where('posted',1)
+                ->where('deleted',0)
+                ->orderBy('refid','DESC')
+                ->first();
+
+            if ($getLastPostMonth) {
+                $postMonth = $getLastPostMonth->refid;
+                if ($postMonth > $orMonthYear) {
+                    return response()->json([
+                        'status'=>403,
+                        'data'=>'',
+                        'message'=> "OR Date is ealier than current month is not allowed."
+                    ]);
+                }
+            }
             
             $transaction = DB::transaction(function($data) use($data){
                 $pcv = 1;

@@ -57,6 +57,16 @@ class CollectionController extends Controller
         $data['entityvalues']   = $request-> input('entityvalues');
         $data['remarks']        = $request-> input('remarks');
 
+        $orCollectionType= substr($data['orno'],0,3);
+        $collectionTypeList = array('SI-','OR-');
+        if (!in_array($orCollectionType, $collectionTypeList)) {
+            return response()->json([
+                'status'=> 403,
+                'data'=>'',
+                'message'=>"OR no. {$data['orno']} is not valid. Should begin with SI- or OR-."
+            ]);
+        }
+
         $orMonthYear = date('mY',strtotime($data['ordate']));
 
         $isClosed = DB::table('transaction')
@@ -70,8 +80,26 @@ class CollectionController extends Controller
             return response()->json([
                 'status'=>403,
                 'data'=>'',
-                'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction."
+                'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create any transaction."
             ]);
+        }
+
+        $getLastPostMonth = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->orderBy('refid','DESC')
+            ->first();
+
+        if ($getLastPostMonth) {
+            $postMonth = $getLastPostMonth->refid;
+            if ($postMonth > $orMonthYear) {
+                return response()->json([
+                    'status'=>403,
+                    'data'=>'',
+                    'message'=> "OR Date is ealier than current month is not allowed."
+                ]);
+            }
         }
 
         $isOrnoExist = $collection
@@ -84,7 +112,7 @@ class CollectionController extends Controller
                 'status'=> 403,
                 'data'=>'',
                 'message'=>"OR no. {$data['orno']} is already exists."
-            ]);         
+            ]);
         } else {
             // saving collections
             DB::transaction(function($data) use($data){
@@ -249,7 +277,8 @@ class CollectionController extends Controller
         $collection = DB::table('collection')
             ->select (
                 'collectionid',
-                DB::raw('CAST(orno as UNSIGNED) as orno'),
+                // DB::raw('CAST(orno as UNSIGNED) as orno'),
+                'orno',
                 'collection.personid',
                 DB::raw('CONCAT(person.lname,", ",person.fname, " ",person.mname) as fullname'),
                 'collection.type',

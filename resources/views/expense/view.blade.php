@@ -51,7 +51,7 @@
     <div class="pull-right">
       <button class="btn btn-success" ng-click="ec.addExpense()">
         <i class="glyphicon glyphicon-plus"></i>
-        Add New Collection
+        Add New Expense
       </button>
     </div>
   </div>

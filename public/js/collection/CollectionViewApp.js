@@ -39,7 +39,8 @@ define([
 
             }
             appBlockUI.stop();
-          },function(){alert("Error occured!");
+          },function(){
+            // alert("Error occured!");
             appBlockUI.stop();
           });
         };

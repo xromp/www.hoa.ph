@@ -30,7 +30,7 @@ define('sims.collection',[
 				controller:'CollectionCreateCtrl',
 				controllerAs:'p',
 				resolve:dependencyResolver([
-					'/js/collection/CollectionCreateApp.js'
+					'/js/collection/CollectionCreateApp.js?v=20170716'
 				])
 			})
 			.when('/collection/edit/:id',{
@@ -46,9 +46,9 @@ define('sims.collection',[
 				controller:'CollectionCtrl',
 				controllerAs:'ce',
 				resolve:dependencyResolver([
-					'/js/collection/CollectionApp.js',
-					'/js/collection/CollectionViewApp.js',
-					'/js/collection/CollectionCreateApp.js'
+					'/js/collection/CollectionApp.js?v=20170716',
+					'/js/collection/CollectionViewApp.js?v=20170716',
+					'/js/collection/CollectionCreateApp.js?v=20170716'
 				])
 			})
 			.when('/collection/reports',{

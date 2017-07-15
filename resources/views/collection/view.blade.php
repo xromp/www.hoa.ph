@@ -60,8 +60,8 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>OR No.</th>
-          <th>OR Date</th>
+          <th>Ref No.</th>
+          <th>Ref Date</th>
           <th>Collection Category</th>
           <th>Amount</th>
           <th>Date Encoded</th>
@@ -71,7 +71,7 @@
       <tbody>
         <tr ng-class="{'bg-success':collection.posted,'bg-danger':collection.deleted}" ng-repeat="collection in cv.collectionDetails | orderBy:'orno'" ng-click="cv.showDetails(collection)">
           <td ><% $index+1 %></td>
-          <td class="text-center" ng-bind="cv.zeroPad(collection.orno,6)"></td>
+          <td class="text-left" ng-bind="collection.orno"></td>
           <td ng-bind="collection.ordate | date:'dd-MMM-yyyy'"></td>
           <td ng-bind="collection.category_description"></td>
           <td class="text-right" ng-bind="collection.amount | number:2" style="padding-right:5%"></td>
