@@ -46,9 +46,28 @@
                                 <button type="button" class="btn btn-default" ng-click="rc.datepickerOpen(rc,'ENDDATE')"><i class="glyphicon glyphicon-calendar"></i></button>
                               </span>
                             </p>
-
+                          </div>
+                      </div>
+                      <div class="col-md-12" ng-show="rc.query.code == 'CURRENTBALANCE'">
+                        <label class="col-md-1 control-label">Month</label>
+                        <div class="form-group">
+                          <div class="col-md-3 col-sm-9 col-xs-12">
+                            <select class="form-control col-md-7 col-xs-12" ng-model="rc.query.month" required>
+                              <option ng-repeat="month in rc.months" ng-bind="month.description" ng-value="month.id"></option>
+                            </select>
+                            <!-- <input type="text" name="type"  class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.type" required> -->
+                            <span class="help-block" ng-show="cc.frmCreate.type.$invalid && cc.frmCreate.withError">type is required field.</span>
                           </div>
 
+                          <div class="col-md-3 col-sm-9 col-xs-12">
+                            <select class="form-control col-md-7 col-xs-12" ng-model="rc.query.year" required>
+                              <option ng-repeat="year in rc.years" ng-bind="year" ng-value="year"></option>
+                            </select>
+                            <!-- <input type="text" name="type"  class="form-control col-md-7 col-xs-12" ng-model="cc.collectionDetails.type" required> -->
+                            <span class="help-block" ng-show="cc.frmCreate.type.$invalid && cc.frmCreate.withError">type is required field.</span>
+                          </div>
+
+                        </div>
                       </div>
                     </div>
                     <div class="row">

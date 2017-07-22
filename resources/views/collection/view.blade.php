@@ -59,7 +59,7 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>#</th>
+          <th>#1</th>
           <th>Ref No.</th>
           <th>Ref Date</th>
           <th>Collection Category</th>

@@ -3,14 +3,13 @@
 <div>
   <h5>
     GREVHAI<br>
-    Current Balance<br>
-    For the of month {{$data['formData']['datename']}}
+    Financial for the of {{$data['formData']['datename']}} <br>
   </h5>
 </div>
 <br>
 <div class="row">
   <div class="col-xs-8">
-    <div class="col-xs-6 col-xs-offset-1">Previous Month Total Collections</div>
+    <div class="col-xs-6 col-xs-offset-1">Balance carried forward May 2016</div>
     <div><span class=" pull-right">{{ number_format($data['data']['collection']['prev_total'],2) }}</span></div>
 
     @foreach ($data['data']['collection']['details']->sortBy('category')  as $key=> $or)

@@ -17,6 +17,8 @@ define([
           vm.query = {
             'startdate':new Date(vm.curDate.getFullYear(),vm.curDate.getMonth()),
             'enddate':new Date(vm.curDate.getFullYear(),vm.curDate.getMonth()+1,0),
+            'month':(new Date()).getMonth()+1,
+            'year':(new Date()).getFullYear(),
             'code':'ORLISTING'
           };
         };
@@ -25,10 +27,26 @@ define([
           {'id':1,'code':'ORLISTING','description':'OR Listing','url':'/collection/reports/orlisting'},
           {'id':3,'code':'ORCHECKLIST','description':'OR Checklist','url':''},
           {'id':2,'code':'SUMMARYCOLLECTION','description':'Summary Collection & Expense','url':'/transaction/reports/comparative'},
-          {'id':4,'code':'CURRENTBALANCE','description':'Current Balance for the month','url':'/transaction/reports/currentbalance'},
+          {'id':4,'code':'CURRENTBALANCE','description':'Financial (Income & Expense)','url':'/transaction/reports/currentbalance'},
           {'id':5,'code':'PERSONLIST','description':'Members List','url':'/person/report/getpersonprofile'}
         ];
+          
+        vm.months = [
+          {'id':1,'code':'JAN','description':'January'},
+          {'id':2,'code':'FEB','description':'February'},
+          {'id':3,'code':'MAR','description':'March'},
+          {'id':4,'code':'APR','description':'April'},
+          {'id':5,'code':'MAY','description':'May'},
+          {'id':6,'code':'JUN','description':'June'},
+          {'id':7,'code':'JUL','description':'July'},
+          {'id':8,'code':'AUG','description':'August'},
+          {'id':9,'code':'SEP','description':'September'},
+          {'id':10,'code':'OCT','description':'October'},
+          {'id':11,'code':'NOV','description':'November'},
+          {'id':12,'code':'DEC','description':'December'}
+        ];
 
+        vm.years = [2016,2017,2018,2019,2020,2021];
         vm.generateReport = function(data) {
           var dataCopy = angular.copy(data);
           var windowOrlisting;
@@ -42,8 +60,11 @@ define([
           dataCopy.enddate = $filter('date')(dataCopy.enddate,'yyyy-MM-dd');
           
           if (dataCopy.reporturl == '/transaction/reports/currentbalance') {
-            var month = (new Date()).getMonth()+1;
-            var year = (new Date()).getFullYear();
+            // var month = (new Date()).getMonth()+1;
+            // var year = (new Date()).getFullYear();
+            var month = dataCopy.month;
+            var year = dataCopy.year;
+
             windowOrlisting = $window.open(window.location.origin+dataCopy.reporturl+'?month='+month+'&year='+year+'', '_blank');
           } else {
             windowOrlisting = $window.open(window.location.origin+dataCopy.reporturl+'?startdate='+dataCopy.startdate+'&enddate='+dataCopy.enddate+'', '_blank');

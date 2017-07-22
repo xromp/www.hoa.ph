@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GREVHAI | Financial System </title>
          <!-- No Cache BEGIN -->
+    <meta content="no-cache" />
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="no-cache">
     <meta http-equiv="Expires" content="-1">
