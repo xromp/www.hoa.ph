@@ -4,7 +4,7 @@
   <h5>
     GREVHAI<br>
     Current Balance<br>
-    For the of month {{$data['formData']['month']}} {{$data['formData']['year']}}
+    For the of month {{$data['formData']['datename']}}
   </h5>
 </div>
 <br>
@@ -34,6 +34,6 @@
     @endforeach
 
     <div class="col-xs-6 col-xs-offset-1">Total Expense</div>
-    <div><strong class="pull-right">{{ number_format(($data['data']['expense']['details_total'] + $data['data']['expense']['prev_total']),2) }}</strong></div>
+    <div class=""><strong class="pull-right">{{ number_format(($data['data']['expense']['details_total'] + $data['data']['expense']['prev_total']),2) }}</strong></div>
   </div>
 </div>

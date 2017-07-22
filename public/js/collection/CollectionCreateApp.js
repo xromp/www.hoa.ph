@@ -15,13 +15,23 @@ define([
           type:'HOMEOWNER',
           qty:1,
           amount:'',
-          category_code:'MONTHLYDUES',
+          category_code:'GATEFEE',
           action:'CREATE'
         };
 
         if ($routeParams.id) {
           vm.collectionDetails.action = 'EDIT';
           vm.collectionDetails.collectionid = $routeParams.id;
+        }
+
+        vm.default = function(){
+          vm.collectionDetails = {
+            type:'HOMEOWNER',
+            qty:1,
+            amount:'',
+            category_code:'GATEFEE',
+            action:'CREATE'
+          };
         }
 
         vm.init  = function() {
@@ -112,8 +122,9 @@ define([
             CollectionCreateSrvcs.action(dataCopy)
             .then (function (response) {
               if (response.data.status == 200) {
-                
-                vm.personInfo = {};
+                if (dataCopy.action = 'CREATE') {
+                  vm.default();
+                }
               } else {
 
               }
@@ -151,7 +162,12 @@ define([
           .then (function (response) {
             if (response.data.status == 200) {
               vm.collectionDetails = response.data.data[0];
-              vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
+              // vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
+               // vm.collectionDetails.ordate = $filter('date')(vm.collectionDetails.ordate,'MM/dd/yyyy');
+               vm.collectionDetails.ordate = new Date(vm.collectionDetails.ordate);
+               vm.getRefList(vm.collectionDetails);
+               
+               console.log(vm.collectionDetails.ordate);
               vm.collectionDetails.amount = parseFloat(vm.collectionDetails.amount);
               vm.collectionDetails.action = dataCopy.action;
 
@@ -371,7 +387,12 @@ define([
 
             var formDataCopy = angular.copy(i);
             formDataCopy.type = vm.formData.type;
+            formDataCopy.status = 'MARRIED';
             formDataCopy.action = 'CREATE';
+            formDataCopy.lname = formDataCopy.lname.toUpperCase();
+            formDataCopy.fname = formDataCopy.fname.toUpperCase();
+            formDataCopy.mname = formDataCopy.mname ? formDataCopy.mname.toUpperCase() : '';
+
 
             var formData = angular.toJson(formDataCopy);
             CollectionCreateSrvcs.saveperson(formData)

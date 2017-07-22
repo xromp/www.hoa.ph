@@ -280,7 +280,7 @@ class CollectionController extends Controller
                 // DB::raw('CAST(orno as UNSIGNED) as orno'),
                 'orno',
                 'collection.personid',
-                DB::raw('CONCAT(person.lname,", ",person.fname, " ",person.mname) as fullname'),
+                DB::raw('CONCAT(person.lname,", ",person.fname, " ",COALESCE(person.mname,"")) as fullname'),
                 'collection.type',
                 'ordate',
                 'collection_category.description as category_description', 

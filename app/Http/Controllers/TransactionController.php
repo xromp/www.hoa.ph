@@ -309,15 +309,18 @@ class TransactionController extends Controller
     }
 
     public function currentbalance(Request $request){
+        // get transaction doesnt closed
         $formData = array(
             'month' => $request->input('month'),
             'year' => $request->input('year')
         );
+        $formData['datename'] = date('F Y', strtotime($formData['year'].sprintf('%02d', $formData['month']).'01'));
 
         $totalPrevCollection = 0;
         $totalPrevExpense = 0;
         $totalCurrentExpense = 0;
         $totalCurrentCollections = 0;
+
 
         $closedCollection = DB::Table('transaction')
             ->where('trantype','CLOSING')
@@ -331,7 +334,24 @@ class TransactionController extends Controller
         if ($closedCollection) {
             $totalPrevCollection= $closedCollection->amount;
         }
+
+        $isBegBal = DB::Table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->count();
         
+        if ($isBegBal == 1) {
+            $begBal = DB::Table('transaction')
+                ->where('trantype','CLOSING')
+                ->where('trantype1','BEGBAL')
+                ->where('posted',1)
+                ->where('closed',1)
+                ->where('deleted',0)
+                ->first();
+            $totalPrevCollection = $begBal->amount;
+        }
+
         $closedExpense = DB::Table('transaction')
             ->where('trantype','CLOSING')
             ->where('trantype1','EXPENSE')
@@ -354,8 +374,8 @@ class TransactionController extends Controller
             ->leftjoin('collection as c','t.refid','=','c.orno')
             ->leftjoin('collection_category as cc','cc.code','=','c.category')
             ->where('trantype','COLLECTION')
-            ->whereMonth('refdate',$formData['month'])
-            ->whereYear('refdate',$formData['year'])
+            // ->whereMonth('refdate',$formData['month'])
+            // ->whereYear('refdate',$formData['year'])
             ->where('t.posted',1)
             ->where('t.closed',0)
             ->where('t.deleted',0)

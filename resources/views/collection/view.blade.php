@@ -63,6 +63,7 @@
           <th>Ref No.</th>
           <th>Ref Date</th>
           <th>Collection Category</th>
+          <th>From</th>
           <th>Amount</th>
           <th>Date Encoded</th>
           <th></th>
@@ -74,6 +75,7 @@
           <td class="text-left" ng-bind="collection.orno"></td>
           <td ng-bind="collection.ordate | date:'dd-MMM-yyyy'"></td>
           <td ng-bind="collection.category_description"></td>
+          <td ng-bind="collection.fullname"></td>
           <td class="text-right" ng-bind="collection.amount | number:2" style="padding-right:5%"></td>
           <td ng-bind="collection.created_at | date:'dd-MMM-yyyy'"></td>
           <td class="">
