@@ -57,61 +57,11 @@ class CollectionController extends Controller
         $data['entityvalues']   = $request-> input('entityvalues');
         $data['remarks']        = $request-> input('remarks');
 
-        $orCollectionType= substr($data['orno'],0,3);
-        $collectionTypeList = array('SI-','OR-');
-        if (!in_array($orCollectionType, $collectionTypeList)) {
+        if (!$this->orValidations($data)['isvalid']) {
             return response()->json([
                 'status'=> 403,
                 'data'=>'',
-                'message'=>"OR no. {$data['orno']} is not valid. Should begin with SI- or OR-."
-            ]);
-        }
-
-        $orMonthYear = date('mY',strtotime($data['ordate']));
-
-        $isClosed = DB::table('transaction')
-            ->where('trantype','CLOSING')
-            ->where('refid',$orMonthYear)
-            ->where('posted',1)
-            ->where('deleted',0)
-            ->first();
-
-        if ($isClosed) {
-            return response()->json([
-                'status'=>403,
-                'data'=>'',
-                'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create any transaction."
-            ]);
-        }
-
-        $getLastPostMonth = DB::table('transaction')
-            ->where('trantype','CLOSING')
-            ->where('posted',1)
-            ->where('deleted',0)
-            ->orderBy('refid','DESC')
-            ->first();
-
-        if ($getLastPostMonth) {
-            $postMonth = $getLastPostMonth->refid;
-            if ($postMonth > $orMonthYear) {
-                return response()->json([
-                    'status'=>403,
-                    'data'=>'',
-                    'message'=> "OR Date is ealier than current month is not allowed."
-                ]);
-            }
-        }
-
-        $isOrnoExist = $collection
-                    -> where('orno','=',$data['orno'])
-                    -> where('deleted',0)
-                    -> first();
-
-        if ($isOrnoExist) {
-            return response()->json([
-                'status'=> 403,
-                'data'=>'',
-                'message'=>"OR no. {$data['orno']} is already exists."
+                'message'=>$this->orValidations($data)['message']
             ]);
         } else {
             // saving collections
@@ -189,6 +139,7 @@ class CollectionController extends Controller
             $collection_line = new Collection_line;
 
             $data = array();
+            $data['action']        = 'EDIT';
             $data['collectionid']   = $request-> input('collectionid');
             $data['orno']           = $request-> input('orno');
             $data['ordate']         = $request-> input('ordate');
@@ -199,28 +150,16 @@ class CollectionController extends Controller
             $data['entityvalues']   = $request-> input('entityvalues');
             $data['remarks']        = $request-> input('remarks');
 
-            $isOrnoExist = $collection
-                        -> where('orno','=',$data['orno'])
-                        -> where('deleted',0)
-                        -> first();
-
-            if (!$isOrnoExist) {
+            if (!$this->orValidations($data)['isvalid']) {
                 return response()->json([
                     'status'=> 403,
                     'data'=>'',
-                    'message'=>"OR no. {$data['orno']} is doesn't exists."
-                ]);
-            } else if ($isOrnoExist->posted){
-                return response()->json([
-                    'status'=> 403,
-                    'data'=>'',
-                    'message'=>"OR no. {$data['orno']} was already posted."
+                    'message'=>$this->orValidations($data)['message']
                 ]);
 
             }
 
             $transaction = DB::transaction(function($data) use($data){
-                // dd($data['orno']);
                 $collection = new Collection;
                 
                 $collectionUpdated = DB::table('collection')
@@ -429,5 +368,62 @@ class CollectionController extends Controller
             'data'=>'',
             'message'=>"Successfully deleted."
         ]);
+    }
+
+    public function orValidations($data){
+        $validation = array(
+            'isvalid'=>true
+        );
+
+        $collection = new Collection;
+        $collection_line = new Collection_line;
+
+        $orCollectionType= substr($data['orno'],0,3);
+        $collectionTypeList = array('SI-','OR-');
+        if (!in_array($orCollectionType, $collectionTypeList)) {
+            $validation['isvalid'] = false;
+            $validation['message'] = "OR no. {$data['orno']} is not valid. Should begin with SI- or OR-.";
+        }
+
+        $orMonthYear = date('Ym',strtotime($data['ordate']));
+
+        $isClosed = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('refid',$orMonthYear)
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->first();
+
+        if ($isClosed) {
+            $validation['isvalid'] = false;
+            $validation['message'] = date('F Y',strtotime($data['ordate']))." already closed. Can't create any transaction.";
+        }
+
+        $getLastPostMonth = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('trantype1','<>','BEGBAL')
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->orderBy('refid','DESC')
+            ->first();
+
+        if ($getLastPostMonth) {
+            $postMonth = $getLastPostMonth->refid;
+            if ($postMonth > $orMonthYear) {
+                $validation['isvalid'] = false;
+                $validation['message'] = "OR Date is ealier than current month is not allowed.";
+            }
+        }
+
+        $isOrnoExist = $collection
+                    -> where('orno','=',$data['orno'])
+                    -> where('deleted',0)
+                    -> first();
+
+        if ($isOrnoExist && $data['action'] !='EDIT') {
+            $validation['isvalid'] = false;
+            $validation['message'] = "OR no. {$data['orno']} is already exists.";
+        }
+        return $validation;
     }
 }

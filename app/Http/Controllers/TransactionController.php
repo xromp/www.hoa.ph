@@ -131,6 +131,34 @@ class TransactionController extends Controller
 	    		]);
     		}
     	}
+        $orMonthYear = date('Ym',strtotime($formData['refdate']));
+        $isClosed = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('refid',$orMonthYear)
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->first();
+
+        if ($isClosed) {
+            $validation['isvalid'] = false;
+            $validation['message'] = date('F Y',strtotime($formData['ordate']))." already closed. Can't create transaction.";
+        }
+
+        $getLastPostMonth = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->orderBy('refid','DESC')
+            ->first();
+
+        if ($getLastPostMonth) {
+            $postMonth = $getLastPostMonth->refid;
+            if ($postMonth > $orMonthYear) {
+                $validation['isvalid'] = false;
+                $validation['message'] = "PCV Date is ealier than current month is not allowed.";
+            }
+        }
+
 
     	DB::transaction(function($formData) use($formData) {
     		$transaction  = new Transaction;
@@ -173,10 +201,11 @@ class TransactionController extends Controller
             'month'=>$request->input('month'),
             'year'=>$request->input('year')
         );
+        $formData['month'] = sprintf('%02d', $formData['month']);
 
         $isPosted = DB::table('transaction')
             ->where('trantype','CLOSING')
-            ->where('refid',$formData['month']."".$formData['year'])
+            ->where('refid',$formData['year'].$formData['month'])
             ->where('posted',1)
             ->where('deleted',0)
             ->first();
@@ -190,7 +219,8 @@ class TransactionController extends Controller
 
         $transaction = DB::transaction(function($formData) use($formData){
             $amount = 0;
-
+            $balanceForwarded = array();
+            $formData['refid'] = $formData['year'].$formData['month'];
 
             $collection = DB::table('transaction')
                 ->select(DB::raw('SUM(amount) as amount'))
@@ -208,7 +238,7 @@ class TransactionController extends Controller
             $transaction = new Transaction;
             $transaction->trantype          = 'CLOSING';
             $transaction->trantype1         = 'COLLECTION';
-            $transaction->refid             = $formData['month']."".$formData['year'];
+            $transaction->refid             = $formData['refid'];
             $transaction->refdate           = date("Y-m-d H");
             $transaction->amount            = $amount;
             $transaction->posted            = 1;
@@ -230,16 +260,38 @@ class TransactionController extends Controller
             if ($expense->amount) {
                 $amount = $expense->amount;
             }
+
             $transaction = new Transaction;
             $transaction->trantype          = 'CLOSING';
             $transaction->trantype1         = 'EXPENSE';
-            $transaction->refid             = $formData['month']."".$formData['year'];
+            $transaction->refid             = $formData['refid'];
             $transaction->refdate           = date("Y-m-d H");
             $transaction->amount            = $amount;
             $transaction->posted            = 1;
             $transaction->closed            = 0;
             $transaction->datefinancial     = date("Y-m-d H");
             $transaction->save();
+
+            $balanceForwarded = $this->getCurrentBalanceForwarded($formData['month'], $formData['year']);
+
+            if (!$balanceForwarded) {
+                throw new \Exception("No Balance forwarded", 1);
+            }
+            $transaction = new Transaction;
+            $transaction->trantype          = 'CLOSING';
+            $transaction->trantype1         = 'CURRENT';
+            $transaction->refid             = $formData['refid'];
+            $transaction->refdate           = date("Y-m-d H");
+            $transaction->amount            = ($collection->amount + $balanceForwarded['total']) - $expense->amount;
+            $transaction->posted            = 1;
+            $transaction->closed            = 0;
+            $transaction->datefinancial     = date("Y-m-d H");
+            $transaction->save();
+
+            // update transaction balance forwarded to closed.
+            $updateBalanceForwarded = DB::table('transaction')
+                ->where('transactionid',$balanceForwarded['transactionid'])
+                ->update(['closed'=>1]);
 
             $updateTransaction = DB::table('transaction')
                 ->whereMonth('refdate',$formData['month'])
@@ -253,13 +305,12 @@ class TransactionController extends Controller
                 })
                 ->update(['closed'=>1]);
 
-            if ($updateTransaction) {
-                return response()-> json([
-                    'status'=>200,
-                    'data'=>'',
-                    'message'=>'Successfully posted.'
-                ]);
-            }
+            return response()-> json([
+                'status'=>200,
+                'data'=>'',
+                'message'=>'Successfully posted.'
+            ]);
+
         });
         return $transaction;
     }
@@ -315,55 +366,25 @@ class TransactionController extends Controller
             'year' => $request->input('year')
         );
         $formData['datename'] = date('F Y', strtotime($formData['year'].sprintf('%02d', $formData['month']).'01'));
+        $formData['refid'] = $formData['year'].sprintf('%02d', $formData['month']);
 
         $totalPrevCollection = 0;
         $totalPrevExpense = 0;
         $totalCurrentExpense = 0;
         $totalCurrentCollections = 0;
+        $totalCurrent =0;
 
+        $balanceForwarded = array(
+            'monthname' => '',
+            'total' => 0
+        );
+        $balanceEnding = array(
+            'monthname' => $formData['datename'],
+            'total' => 0
+        );
 
-        $closedCollection = DB::Table('transaction')
-            ->where('trantype','CLOSING')
-            ->where('trantype1','COLLECTION')
-            ->where('posted',1)
-            ->where('closed',0)
-            ->where('deleted',0)
-            ->where('refid',sprintf('%02d', $formData['month']-1)."".$formData['year'])
-            ->first();
-
-        if ($closedCollection) {
-            $totalPrevCollection= $closedCollection->amount;
-        }
-
-        $isBegBal = DB::Table('transaction')
-            ->where('trantype','CLOSING')
-            ->where('posted',1)
-            ->where('deleted',0)
-            ->count();
-        
-        if ($isBegBal == 1) {
-            $begBal = DB::Table('transaction')
-                ->where('trantype','CLOSING')
-                ->where('trantype1','BEGBAL')
-                ->where('posted',1)
-                ->where('closed',1)
-                ->where('deleted',0)
-                ->first();
-            $totalPrevCollection = $begBal->amount;
-        }
-
-        $closedExpense = DB::Table('transaction')
-            ->where('trantype','CLOSING')
-            ->where('trantype1','EXPENSE')
-            ->where('posted',1)
-            ->where('closed',0)
-            ->where('deleted',0)
-            ->where('refid',sprintf('%02d', $formData['month']-1)."".$formData['year'])
-            ->first();
-
-        if ($closedExpense) {
-            $totalPrevExpense= $closedExpense->amount;
-        }
+        // get previous current posting
+        $balanceForwarded = $this->getCurrentBalanceForwarded($formData['month'],$formData['year']);
 
         $currentCollection = DB::table('transaction as t')
             ->select(
@@ -394,9 +415,11 @@ class TransactionController extends Controller
                 DB::raw('MAX(COALESCE(cc.description,"")) as category_desc'), 
                 DB::raw('sum(COALESCE(t.amount,0)) as amount')
             )
-            ->leftjoin('expense as c','t.refid','=','c.orno')
+            ->leftjoin('expense as c','t.refid','=','c.pcv')
             ->leftjoin('expense_category as cc','cc.code','=','c.category')
             ->where('trantype','EXPENSE')
+            ->whereMonth('refdate',$formData['month'])
+            ->whereYear('refdate',$formData['year'])
             ->where('t.posted',1)
             ->where('t.closed',0)
             ->where('t.deleted',0)
@@ -408,6 +431,9 @@ class TransactionController extends Controller
         foreach ($currentExpense as $key => $exp) {
             $totalCurrentExpense += $exp->amount;
         }
+
+        // Ending Balance for the month
+        $balanceEnding['total'] = ($balanceForwarded['total'] + $totalCurrentCollections ) - $totalCurrentExpense;
         $data = array(
             'data'=>array(
                 'collection'=>array(
@@ -419,10 +445,69 @@ class TransactionController extends Controller
                     'details'=>$currentExpense,
                     'details_total'=> $totalCurrentExpense,
                     'prev_total'=>$totalPrevExpense
-                )
+                ),
+                'balanceforwarded' => $balanceForwarded,
+                'balanceending' => $balanceEnding
             ),
             'formData' => $formData
         );
         return view('collection.reports.current-balance', array('data'=>$data));
+    }
+
+    public function getCurrentBalanceForwarded($month, $year){
+        // get previous current posting
+        $balanceForwarded = array();
+        $formData = array(
+            'month'=>$month,
+            'year'=>$year
+        );
+        $formData['refid'] = $formData['year'].sprintf('%02d', $formData['month']);
+
+        $currentClosed = DB::Table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('trantype1','CURRENT')
+            ->where('posted',1)
+            ->where('closed',0)
+            ->where('deleted',0)
+            ->where('refid',$formData['year']."".sprintf('%02d', $formData['month']-1))
+            ->first();
+
+        if ($currentClosed) {
+            $balanceForwarded['transactionid'] = $currentClosed->transactionid;
+            $balanceForwarded['total'] = $currentClosed->amount;
+            $balanceForwarded['monthname'] = date('F Y', strtotime(substr($currentClosed->refid, 0,4).substr($currentClosed->refid, 4,2).'01'));
+        } else {
+            $firstCurrentClosed = DB::Table('transaction')
+                ->where('trantype','CLOSING')
+                ->where('trantype1','CURRENT')
+                ->where('posted',1)
+                ->where('closed',0)
+                ->where('deleted',0)
+                ->orderBy('refid')
+                ->first();
+
+            $lastestCurrentClosed = DB::Table('transaction')
+                ->where('trantype','CLOSING')
+                ->where('trantype1','CURRENT')
+                ->where('posted',1)
+                ->where('closed',0)
+                ->where('deleted',0)
+                ->orderBy('refid','desc')
+                ->first();
+
+            if ($firstCurrentClosed) {
+                if ($firstCurrentClosed->refid >= $formData['refid']) {
+                    $balanceForwarded['transactionid'] = 0;
+                    $balanceForwarded['total'] = 0;
+                    $balanceForwarded['monthname'] = 'Beyond Beginning Balance.';
+                } else {
+                    $balanceForwarded['transactionid'] = $lastestCurrentClosed->transactionid;
+                    $balanceForwarded['total'] = $lastestCurrentClosed->amount;
+                    $balanceForwarded['monthname'] = date('F Y', strtotime(substr($lastestCurrentClosed->refid, 0,4).substr($lastestCurrentClosed->refid, 4,2).'01'));
+                }
+            }
+        }
+
+        return $balanceForwarded;
     }
 }

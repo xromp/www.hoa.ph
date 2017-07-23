@@ -98,41 +98,13 @@ class ExpenseController extends Controller
             $data['remarks']            = $request-> input('remarks');
             $data['establishment']      = $request-> input('establishment');
 
-            $orMonthYear = date('mY',strtotime($data['ordate']));
-
-            $isClosed = DB::table('transaction')
-                ->where('trantype','CLOSING')
-                ->where('refid',$orMonthYear)
-                ->where('posted',1)
-                ->where('deleted',0)
-                ->first();
-
-            if ($isClosed) {
+            if (!$this->pcvValidations($data)['isvalid']) {
                 return response()->json([
-                    'status'=>403,
+                    'status'=> 403,
                     'data'=>'',
-                    'message'=> date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction."
+                    'message'=>$this->pcvValidations($data)['message']
                 ]);
             }
-
-            $getLastPostMonth = DB::table('transaction')
-                ->where('trantype','CLOSING')
-                ->where('posted',1)
-                ->where('deleted',0)
-                ->orderBy('refid','DESC')
-                ->first();
-
-            if ($getLastPostMonth) {
-                $postMonth = $getLastPostMonth->refid;
-                if ($postMonth > $orMonthYear) {
-                    return response()->json([
-                        'status'=>403,
-                        'data'=>'',
-                        'message'=> "OR Date is ealier than current month is not allowed."
-                    ]);
-                }
-            }
-            
             $transaction = DB::transaction(function($data) use($data){
                 $pcv = 1;
                 $expense = new Expense;
@@ -230,6 +202,13 @@ class ExpenseController extends Controller
             $data['remarks']                = $request-> input('remarks');
             $data['establishment']          = $request-> input('establishment');
 
+            if (!$this->pcvValidations($data)['isvalid']) {
+                return response()->json([
+                    'status'=> 403,
+                    'data'=>'',
+                    'message'=>$this->pcvValidations($data)['message']
+                ]);
+            }
             $isPCVnoExist = $expense
                         -> where('pcv','=',$data['pcv'])
                         -> where('deleted',0)
@@ -240,7 +219,7 @@ class ExpenseController extends Controller
                     'status'=> 403,
                     'data'=>'',
                     'message'=>"PCV No. {$data['pcv']} doesn't exists."
-                ]);         
+                ]);
             } else {
                 // saving collections
                 $transaction = DB::transaction(function($data) use($data){
@@ -296,29 +275,29 @@ class ExpenseController extends Controller
     public function delete(Request $request)
     {
         $formData = array(
-            'orno'=> $request-> input('orno')
+            'orno'=> $request-> input('orno'),
+            'pcv'=> $request-> input('pcv')
         );
 
         $isORNoExist = DB::table('transaction')
-            -> where('refid',$formData['orno'])
+            -> where('refid',$formData['pcv'])
             ->where('trantype','EXPENSE')
             ->where('deleted',0)
             -> first();
 
         if ($isORNoExist) {
-
             if ($isORNoExist->posted) {
                 return response() -> json([
                     'status'=>403,
                     'data'=>'',
-                    'message'=>"OR no. {$isORNoExist->refid} is already posted."
+                    'message'=>"PCV no. {$isORNoExist->refid} is already posted."
                 ]);
             }
         }
 
         DB::transaction(function($formData) use($formData){
             DB::table('expense')
-                -> where('pcv',$formData['orno'])
+                -> where('pcv',$formData['pcv'])
                 -> update(['deleted'=>1]);
         });
 
@@ -327,5 +306,41 @@ class ExpenseController extends Controller
             'data'=>'',
             'message'=>"Successfully deleted."
         ]);
+    }
+
+    public function pcvValidations($data){
+        $validation = array(
+            'isvalid'=>true
+        );
+
+        $orMonthYear = date('Ym',strtotime($data['ordate']));
+        $isClosed = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('refid',$orMonthYear)
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->first();
+
+        if ($isClosed) {
+            $validation['isvalid'] = false;
+            $validation['message'] = date('F Y',strtotime($data['ordate']))." already closed. Can't create transaction.";
+        }
+
+        $getLastPostMonth = DB::table('transaction')
+            ->where('trantype','CLOSING')
+            ->where('posted',1)
+            ->where('deleted',0)
+            ->orderBy('refid','DESC')
+            ->first();
+
+        if ($getLastPostMonth) {
+            $postMonth = $getLastPostMonth->refid;
+            if ($postMonth > $orMonthYear) {
+                $validation['isvalid'] = false;
+                $validation['message'] = "OR Date is ealier than current month is not allowed.";
+            }
+        }
+
+        return $validation;
     }
 }

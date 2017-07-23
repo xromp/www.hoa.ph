@@ -1,0 +1,13 @@
+report 
+
+- Balance carried forwarded - May 2016
+- 
+
+
+collection ordata - replace with html data tags - OK
+clear after submit. - OK
+uppercase collection add person - OK
+retrieve outside in  collection - OK
+cancelled collection
+sorting orno.
+add member to grid
